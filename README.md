@@ -43,6 +43,17 @@ sich decken (Nullsumme) und lässt Abweichungen nur mit ausdrücklichem Haken zu
   um Linien ein- oder auszublenden. Finger/Maus über dem Chart zeigt alle Bilanzen an dem Abend.
 - **Export / Import:** im Footer. Export ist das JSON aus dem Datenblock, Import ersetzt alles.
 
+## Animationen
+
+- **Intro** beim Öffnen (einmal pro Browser-Tab, Tipp überspringt): Spotlight, drei Karten fliegen ein und
+  drehen sich um, der Titel klappt Buchstabe für Buchstabe auf, dazu Chip- und Geldregen im Canvas.
+- **Nieselregen** aus Chips läuft danach hinter den Inhaltsflächen weiter; **Stürme** (Speichern eines
+  Abends, „Make it rain“, Tipp auf den Chip-Stapel) fallen für ein paar Sekunden vor dem Inhalt.
+- Podiumskarten drehen sich vom Rücken auf die Vorderseite, Zahlen zählen hoch, Chart-Linien zeichnen
+  sich, Medaillen drehen ein, LED-Laufband mit Fakten aus den Daten, Gold-Schimmer auf Rand und Titel.
+- **Aus-Schalter** im Footer („Animationen aus“, pro Gerät in `localStorage`), außerdem automatisch aus bei
+  `prefers-reduced-motion`. Der Regen pausiert, wenn der Tab im Hintergrund ist.
+
 ## Backup
 
 `data/backup.json` ist ein manueller Snapshot. Aktualisieren: Artefakt per `Artifact read` holen,
