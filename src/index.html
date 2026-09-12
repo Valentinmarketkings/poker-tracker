@@ -1,4 +1,5 @@
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ein Spitzhackenschlag</title>
 <meta name="description" content="Poker-Rangliste der Freundesrunde">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,16 +13,16 @@
     --surface-2: #1f1d22;
     --line: rgba(243, 236, 220, 0.10);
     --line-strong: rgba(243, 236, 220, 0.22);
-    --ink: #f3ecdc;            /* ivory */
+    --ink: #f3ecdc;
     --ink-2: #b7b0a2;
     --ink-3: #7f7a70;
-    --red: #8f1521;            /* wine: surfaces, structure */
-    --red-2: #b41c2b;          /* lighter wine for gradients */
-    --red-hot: #ff4d57;        /* losses, only for numbers */
+    --red: #8f1521;
+    --red-2: #b41c2b;
+    --red-hot: #ff4d57;
     --gold: #d6b25a;
     --gold-2: #f0d48a;
     --gold-deep: #9a7a34;
-    --card: #fbf8f0;           /* card stock */
+    --card: #fbf8f0;
     --card-2: #ece5d3;
     --card-ink: #141216;
     --card-red: #c0182a;
@@ -31,24 +32,23 @@
     --body: "Manrope", "Avenir Next", "Segoe UI", system-ui, sans-serif;
     --radius: 14px;
     --shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
+    --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
     color-scheme: dark;
   }
   * { box-sizing: border-box; }
   html { background: var(--bg); }
   body {
     margin: 0;
-    background:
-      radial-gradient(ellipse 90% 50% at 50% -10%, rgba(143, 21, 33, 0.35) 0%, transparent 60%),
-      var(--bg);
+    background: radial-gradient(ellipse 90% 50% at 50% -10%, rgba(143, 21, 33, 0.38) 0%, transparent 60%), var(--bg);
     color: var(--ink);
     font-family: var(--body);
     font-size: 16px;
     line-height: 1.5;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
   body::before {
-    /* card-back lattice, barely there */
     content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
     background-image:
       repeating-linear-gradient(45deg, rgba(143, 21, 33, 0.09) 0 1px, transparent 1px 16px),
@@ -56,6 +56,13 @@
     mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 0%, transparent 100%);
     -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 0%, transparent 100%);
   }
+  .anim body::after {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background: radial-gradient(520px circle at var(--mx, 50%) var(--my, 15%), rgba(214, 178, 90, 0.10), transparent 62%);
+    transition: background-position 0.2s;
+  }
+  canvas.rain { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.75; }
+  canvas.rain.front { z-index: 60; opacity: 1; }
   .wrap { position: relative; z-index: 1; max-width: 780px; margin: 0 auto; padding: 18px 14px 130px; }
   @media (min-width: 640px) { .wrap { padding: 30px 24px 130px; } }
 
@@ -66,7 +73,7 @@
   button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
   [hidden] { display: none !important; }
 
-  /* ---------- Chips (player identity) ---------- */
+  /* ---------- Chips ---------- */
   .chip-av {
     --c: #888; --sz: 40px;
     position: relative; display: inline-grid; place-items: center; flex: none;
@@ -74,69 +81,109 @@
     background: repeating-conic-gradient(from -11.25deg, var(--c) 0 30deg, #f6f0e2 30deg 45deg);
     box-shadow: 0 2px 0 rgba(0,0,0,0.6), 0 6px 14px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(0,0,0,0.35);
     color: #0f0d10; font-weight: 800; font-size: calc(var(--sz) * 0.36); letter-spacing: 0.02em;
+    transition: transform 0.25s var(--ease);
   }
   .chip-av::before { content: ""; position: absolute; inset: 15%; border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.35), transparent 55%), var(--c); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.45), inset 0 0 0 3px rgba(0,0,0,0.18); }
   .chip-av > span { position: relative; z-index: 1; }
   .chip-av.sm { --sz: 30px; } .chip-av.lg { --sz: 56px; } .chip-av.xl { --sz: 64px; }
 
-  /* ---------- Header banner: red inlay with gold pinstripes ---------- */
-  header.top { display: flex; flex-direction: column; gap: 14px; margin-bottom: 30px; }
-  .banner { position: relative; border-radius: 18px; padding: 3px; background: linear-gradient(135deg, var(--gold-2), var(--gold-deep) 40%, var(--gold) 70%, var(--gold-deep)); box-shadow: var(--shadow); }
-  .banner-in { position: relative; border-radius: 15px; overflow: hidden; padding: 22px 20px 20px; background: radial-gradient(ellipse 120% 100% at 20% 0%, var(--red-2), var(--red) 55%, #5c0c15 100%); box-shadow: inset 0 0 0 1px rgba(0,0,0,0.35), inset 0 0 0 6px transparent, inset 0 0 0 7px rgba(214,178,90,0.35); }
+  /* ---------- Banner ---------- */
+  header.top { display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
+  .banner { position: relative; border-radius: 18px; padding: 3px; background: linear-gradient(120deg, var(--gold-2), var(--gold-deep) 30%, var(--gold) 50%, var(--gold-deep) 70%, var(--gold-2)); background-size: 300% 100%; box-shadow: var(--shadow); }
+  .anim .banner { animation: sheen 7s ease-in-out infinite alternate; }
+  @keyframes sheen { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
+  .banner-in { position: relative; border-radius: 15px; overflow: hidden; padding: 22px 20px 20px; background: radial-gradient(ellipse 120% 100% at 20% 0%, var(--red-2), var(--red) 55%, #5c0c15 100%); box-shadow: inset 0 0 0 1px rgba(0,0,0,0.35), inset 0 0 0 7px rgba(214,178,90,0.35); }
   .banner-in::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(45deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 10px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 10px); }
   .banner .eyebrow { font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold-2); font-weight: 800; }
-  .banner h1 { font-size: clamp(30px, 8.5vw, 64px); line-height: 0.98; overflow-wrap: anywhere; hyphens: manual; font-weight: 800; color: var(--ink); font-variation-settings: "opsz" 96; margin-top: 6px; text-shadow: 0 2px 0 rgba(0,0,0,0.35); }
+  .banner h1 { font-size: clamp(30px, 8.5vw, 64px); line-height: 0.98; overflow-wrap: anywhere; font-weight: 800; color: var(--ink); font-variation-settings: "opsz" 96; margin-top: 8px; text-shadow: 0 2px 0 rgba(0,0,0,0.35); }
   .banner h1 .s { color: var(--gold-2); font-weight: 500; }
-  .banner .subtitle { color: rgba(243,236,220,0.78); font-size: 14px; margin-top: 8px; }
-  .brand { position: relative; z-index: 1; min-width: 0; }
-  .stack { position: absolute; right: -6px; bottom: -22px; width: 150px; height: 130px; z-index: 0; pointer-events: none; }
+  .anim .banner h1 .t { background: linear-gradient(100deg, #f3ecdc 0%, #f3ecdc 38%, #ffffff 46%, #f0d48a 52%, #f3ecdc 60%, #f3ecdc 100%); background-size: 260% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; animation: shine 5.5s ease-in-out infinite; }
+  @keyframes shine { 0% { background-position: 120% 0; } 60% { background-position: -40% 0; } 100% { background-position: -40% 0; } }
+  .banner .subtitle { color: rgba(243,236,220,0.82); font-size: 14px; margin-top: 8px; font-weight: 700; letter-spacing: 0.04em; }
+  .brand { position: relative; z-index: 1; min-width: 0; padding-right: 150px; }
+  .rain-btn { position: absolute; z-index: 2; top: 12px; right: 12px; border: 1px solid rgba(214,178,90,0.7); background: rgba(0,0,0,0.35); color: var(--gold-2); border-radius: 999px; padding: 5px 11px; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; transition: transform 0.2s var(--ease), background 0.2s; }
+  .rain-btn:hover { background: rgba(214,178,90,0.18); transform: translateY(-1px); }
+  .stack { position: absolute; right: -6px; bottom: -22px; width: 150px; height: 130px; z-index: 0; cursor: pointer; }
   .stack .chip-av { position: absolute; --sz: 74px; }
   .stack .c1 { --c: #17151a; left: 60px; top: 40px; transform: rotate(-8deg); }
   .stack .c2 { --c: #b41c2b; left: 20px; top: 22px; transform: rotate(14deg); }
   .stack .c3 { --c: #d6b25a; left: 76px; top: 0px; transform: rotate(4deg); }
-  .stack .c4 { --c: #f6f0e2; left: 0px; top: 62px; transform: rotate(-20deg); }
+  .stack .c4 { --c: #f6f0e2; left: 0px; top: 62px; transform: rotate(-20deg); background: repeating-conic-gradient(from -11.25deg, #ece5d3 0 30deg, #b41c2b 30deg 45deg); }
   .stack .c4::before { background: radial-gradient(circle at 35% 30%, #fff, transparent 55%), #ece5d3; }
-  .stack .c4 { background: repeating-conic-gradient(from -11.25deg, #ece5d3 0 30deg, #b41c2b 30deg 45deg); }
-  @media (max-width: 520px) { .stack { width: 110px; height: 100px; right: -14px; bottom: -28px; } .stack .chip-av { --sz: 54px; } .stack .c1 { left: 44px; top: 34px; } .stack .c2 { left: 14px; top: 16px; } .stack .c3 { left: 54px; top: 0; } .stack .c4 { left: 0; top: 48px; } .banner h1 { padding-right: 70px; } }
+  .anim .stack .chip-av { animation: hover 4s ease-in-out infinite; }
+  .anim .stack .c2 { animation-delay: -1s; } .anim .stack .c3 { animation-delay: -2s; } .anim .stack .c4 { animation-delay: -3s; }
+  @keyframes hover { 0%, 100% { translate: 0 0; } 50% { translate: 0 -5px; } }
+  .stack:active .chip-av { transform: scale(0.94); }
+  @media (max-width: 520px) { .brand { padding-right: 0; } .stack { width: 100px; height: 92px; right: -24px; bottom: -30px; } .stack .chip-av { --sz: 48px; } .stack .c1 { left: 40px; top: 32px; } .stack .c2 { left: 12px; top: 14px; } .stack .c3 { left: 50px; top: 0; } .stack .c4 { left: 0; top: 44px; } .banner h1 { font-size: clamp(28px, 7.6vw, 64px); padding-right: 40px; } .banner .subtitle { padding-right: 70px; } .banner .eyebrow { padding-right: 120px; } }
+
+  /* ---------- LED ticker ---------- */
+  .ticker { position: relative; overflow: hidden; background: #050405; border-top: 1px solid var(--gold-deep); border-bottom: 1px solid var(--gold-deep); border-radius: 6px; height: 34px; display: flex; align-items: center; }
+  .ticker::before, .ticker::after { content: ""; position: absolute; top: 0; bottom: 0; width: 40px; z-index: 1; pointer-events: none; }
+  .ticker::before { left: 0; background: linear-gradient(90deg, #050405, transparent); }
+  .ticker::after { right: 0; background: linear-gradient(-90deg, #050405, transparent); }
+  .ticker-track { display: inline-flex; align-items: center; gap: 34px; white-space: nowrap; padding-left: 12px; font-size: 12px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red-hot); text-shadow: 0 0 8px rgba(255,77,87,0.55), 0 0 1px rgba(255,77,87,0.9); will-change: transform; }
+  .ticker-track .sep { color: var(--gold); text-shadow: 0 0 8px rgba(214,178,90,0.6); }
+  .ticker-track .hi { color: var(--gold-2); text-shadow: 0 0 8px rgba(240,212,138,0.6); }
+  .anim .ticker-track { animation: marquee var(--dur, 40s) linear infinite; }
+  .anim .ticker:hover .ticker-track { animation-play-state: paused; }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
   .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .summary .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 12px 10px; min-width: 0; position: relative; }
+  .summary .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 12px 10px; min-width: 0; position: relative; transition: transform 0.25s var(--ease); }
+  .summary .tile:hover { transform: translateY(-2px); }
   .summary .tile::before { content: ""; position: absolute; left: 12px; right: 12px; top: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); opacity: 0.8; }
   .summary .tile .v { font-family: var(--display); font-size: 24px; font-weight: 700; line-height: 1.1; color: var(--ink); }
-  .summary .tile .l { font-size: 10.5px; color: var(--ink-3); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 700; }
+  .summary .tile .l { font-size: 10.5px; color: var(--ink-3); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 3px; line-height: 1.25; font-weight: 700; }
 
-  /* ---------- Sections with suit marks ---------- */
+  /* ---------- Sections ---------- */
   section { margin-bottom: 38px; }
   .sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
   .sec-head h2 { font-size: 26px; display: flex; align-items: baseline; gap: 10px; }
-  .sec-head h2 .suit { font-family: var(--body); font-size: 20px; line-height: 1; }
+  .sec-head h2 .suit { font-family: var(--body); font-size: 20px; line-height: 1; display: inline-block; }
+  .anim .sec-head h2 .suit { animation: suitSpin 6s ease-in-out infinite; }
+  @keyframes suitSpin { 0%, 80%, 100% { transform: rotateY(0); } 90% { transform: rotateY(360deg); } }
   .suit.r { color: var(--red-hot); } .suit.b { color: var(--ink); }
   .sec-head .hint { font-size: 12px; color: var(--ink-3); text-align: right; }
 
-  /* ---------- Podium: a dealt hand of three cards ---------- */
-  .hand { display: grid; grid-template-columns: 1fr 1.18fr 1fr; gap: 10px; align-items: end; margin: 8px 0 14px; padding-top: 18px; }
-  .pcard { position: relative; background: linear-gradient(165deg, #fffdf8 0%, var(--card) 45%, var(--card-2) 100%); color: var(--card-ink); border-radius: 12px; padding: 30px 8px 14px; text-align: center; min-width: 0; box-shadow: 0 1px 0 rgba(255,255,255,0.6) inset, 0 12px 28px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,0,0,0.5); transform: rotate(var(--tilt, 0deg)); }
-  .pcard.k { --tilt: -3deg; } .pcard.q { --tilt: 3deg; }
-  .pcard.a { --tilt: 0deg; padding-top: 38px; box-shadow: 0 1px 0 rgba(255,255,255,0.6) inset, 0 0 0 2px var(--gold), 0 0 0 4px rgba(214,178,90,0.25), 0 18px 40px rgba(0,0,0,0.65); }
+  /* ---------- Page cascade after intro ---------- */
+  .anim.ready header.top > *, .anim.ready section, .anim.ready #empty { animation: rise 0.75s var(--ease) both; animation-delay: calc(var(--i, 0) * 90ms); }
+  @keyframes rise { from { opacity: 0.2; transform: translateY(26px); } to { opacity: 1; transform: none; } }
+
+  /* ---------- Podium: dealt hand, cards flip from their backs ---------- */
+  .hand { display: grid; grid-template-columns: 1fr 1.18fr 1fr; gap: 10px; align-items: end; margin: 8px 0 14px; padding-top: 18px; perspective: 1000px; }
+  .slot { transform-style: preserve-3d; transform: rotate(var(--tilt, 0deg)); }
+  .slot.k { --tilt: -3deg; } .slot.q { --tilt: 3deg; } .slot.a { --tilt: 0deg; }
+  .anim .slot.enter { animation: cardDeal 1s cubic-bezier(0.2, 0.9, 0.25, 1) both; animation-delay: calc(var(--i) * 140ms); }
+  @keyframes cardDeal { 0% { transform: translateY(70px) rotate(calc(var(--tilt) - 18deg)) rotateY(180deg); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(0) rotate(var(--tilt)) rotateY(0deg); opacity: 1; } }
+  .pcard { position: relative; transform-style: preserve-3d; background: linear-gradient(165deg, #fffdf8 0%, var(--card) 45%, var(--card-2) 100%); color: var(--card-ink); border-radius: 12px; padding: 30px 8px 14px; text-align: center; min-width: 0; box-shadow: 0 1px 0 rgba(255,255,255,0.6) inset, 0 12px 28px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,0,0,0.5); transition: transform 0.3s var(--ease); }
+  .pcard:hover { transform: translateY(-6px); }
+  .slot.a .pcard { padding-top: 38px; box-shadow: 0 1px 0 rgba(255,255,255,0.6) inset, 0 0 0 2px var(--gold), 0 0 0 4px rgba(214,178,90,0.25), 0 18px 40px rgba(0,0,0,0.65); }
+  .pcard > * { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+  .pcard .pback { position: absolute; inset: 0; border-radius: 12px; transform: rotateY(180deg); background: repeating-linear-gradient(45deg, rgba(214,178,90,0.35) 0 2px, transparent 2px 9px), repeating-linear-gradient(-45deg, rgba(214,178,90,0.35) 0 2px, transparent 2px 9px), linear-gradient(#8f1521, #5c0c15); border: 5px solid #f3ecdc; outline: 1px solid var(--gold-deep); outline-offset: -9px; display: grid; place-items: center; color: var(--gold-2); font-size: 34px; }
   .pcard .idx { position: absolute; font-family: var(--display); font-weight: 800; font-size: 18px; line-height: 0.95; display: flex; flex-direction: column; align-items: center; }
   .pcard .idx.tl { top: 7px; left: 8px; } .pcard .idx.br { bottom: 7px; right: 8px; transform: rotate(180deg); }
   .pcard .idx .su { font-family: var(--body); font-size: 15px; }
-  .pcard.red .idx { color: var(--card-red); } .pcard.black .idx { color: var(--card-ink); }
+  .slot.red .idx { color: var(--card-red); } .slot.black .idx { color: var(--card-ink); }
   .pcard .chip-av { box-shadow: 0 2px 0 rgba(0,0,0,0.35), 0 6px 14px rgba(0,0,0,0.25), inset 0 0 0 1px rgba(0,0,0,0.3); }
   .pcard .name { font-weight: 800; font-size: 15px; margin-top: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--card-ink); }
   .pcard .bal { font-family: var(--display); font-size: 21px; font-weight: 800; margin-top: 1px; color: var(--card-ink); }
-  .pcard.a .bal { font-size: 26px; }
+  .slot.a .bal { font-size: 26px; }
   .pcard .bal.minus { color: var(--card-red); }
   .pcard .meta { font-size: 11px; color: #6c6660; margin-top: 3px; }
   .pcard .crown { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 40px; height: 30px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); }
+  .anim .pcard .crown { animation: bob 3s ease-in-out infinite; }
+  @keyframes bob { 0%, 100% { transform: translateX(-50%) translateY(0) rotate(-4deg); } 50% { transform: translateX(-50%) translateY(-5px) rotate(4deg); } }
   .pcard .place { position: absolute; top: 9px; left: 50%; transform: translateX(-50%); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: #8a8378; font-weight: 800; }
 
   /* ---------- Ranking ---------- */
   .ranking { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--surface); }
   .ranking li { border-top: 1px solid var(--line); }
   .ranking li:first-child { border-top: 0; }
-  .row { display: grid; grid-template-columns: 26px 32px 1fr auto; gap: 10px; align-items: center; padding: 10px 12px; width: 100%; background: none; border: 0; text-align: left; }
+  .anim .ranking li.enter { animation: slideIn 0.55s var(--ease) both; animation-delay: calc(var(--i) * 45ms); }
+  @keyframes slideIn { from { opacity: 0.25; transform: translateX(-16px); } to { opacity: 1; transform: none; } }
+  .row { display: grid; grid-template-columns: 26px 32px 1fr auto; gap: 10px; align-items: center; padding: 10px 12px; width: 100%; background: none; border: 0; text-align: left; transition: background 0.2s; }
   .row:hover { background: rgba(255,255,255,0.03); }
+  .row:hover .chip-av { transform: rotate(18deg) scale(1.08); }
   .row .pos { font-family: var(--display); font-weight: 800; color: var(--ink-3); font-size: 16px; text-align: center; }
   .row .who { min-width: 0; display: flex; flex-direction: column; }
   .row .who .n { font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -146,7 +193,9 @@
   .trend.up { color: var(--gold-2); background: rgba(214,178,90,0.14); }
   .trend.down { color: var(--red-hot); background: rgba(255,77,87,0.12); }
   .trend.flat { color: var(--ink-3); background: rgba(255,255,255,0.06); }
-  .fish { font-size: 11px; color: var(--red-hot); font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+  .fish { display: inline-block; font-size: 11px; color: var(--red-hot); font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+  .anim .fish { animation: wobble 2.6s ease-in-out infinite; }
+  @keyframes wobble { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
   .row.unranked { opacity: 0.5; }
   .details { padding: 0 12px 14px 12px; }
   .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
@@ -157,10 +206,15 @@
   .spark { display: block; width: 100%; height: 44px; margin-top: 8px; }
 
   /* ---------- Badges as medal chips ---------- */
-  .badges { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .badges { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; perspective: 800px; }
   @media (min-width: 560px) { .badges { grid-template-columns: repeat(4, 1fr); } }
-  .badge { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 10px 12px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; min-width: 0; }
+  .badge { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 10px 12px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; min-width: 0; transition: transform 0.25s var(--ease), border-color 0.25s; }
+  .badge:hover { transform: translateY(-4px); border-color: var(--gold-deep); }
   .medal { --c: var(--red); position: relative; width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; background: repeating-conic-gradient(from -11.25deg, var(--c) 0 30deg, var(--gold) 30deg 45deg); box-shadow: 0 2px 0 rgba(0,0,0,0.6), 0 8px 18px rgba(0,0,0,0.5); font-size: 22px; line-height: 1; }
+  .anim .medal.enter { animation: spinIn 0.9s var(--ease) both; animation-delay: calc(var(--i) * 80ms); }
+  @keyframes spinIn { from { transform: rotateY(200deg) scale(0.5); opacity: 0.2; } to { transform: none; opacity: 1; } }
+  .badge:hover .medal { animation: medalSpin 0.7s var(--ease); }
+  @keyframes medalSpin { to { transform: rotateY(360deg); } }
   .medal::before { content: ""; position: absolute; inset: 14%; border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.25), transparent 55%), var(--c); box-shadow: inset 0 0 0 1.5px rgba(214,178,90,0.8); }
   .medal > span { position: relative; z-index: 1; }
   .badge.empty .medal { --c: #26242a; filter: saturate(0.3); opacity: 0.7; }
@@ -173,7 +227,7 @@
   .chart-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 10px 8px; position: relative; }
   .chart-card svg { display: block; width: 100%; height: auto; overflow: visible; }
   .legend { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 4px 4px; }
-  .lchip { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 3px 10px 3px 4px; font-size: 12px; font-weight: 700; color: var(--ink-2); }
+  .lchip { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 3px 10px 3px 4px; font-size: 12px; font-weight: 700; color: var(--ink-2); transition: border-color 0.2s, background 0.2s; }
   .lchip .chip-av { --sz: 18px; box-shadow: none; font-size: 0; }
   .lchip[aria-pressed="true"] { color: var(--ink); border-color: var(--gold-deep); background: rgba(214,178,90,0.08); }
   .lchip.muted .chip-av { filter: grayscale(0.9) brightness(0.55); }
@@ -185,7 +239,8 @@
 
   /* ---------- Session log ---------- */
   .log { display: flex; flex-direction: column; gap: 10px; }
-  .night { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--red); border-radius: var(--radius); padding: 12px 14px; }
+  .night { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--red); border-radius: var(--radius); padding: 12px 14px; transition: transform 0.25s var(--ease), border-color 0.25s; }
+  .night:hover { transform: translateX(3px); border-left-color: var(--gold); }
   .night .h { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
   .night .h .d { font-family: var(--display); font-weight: 800; font-size: 19px; }
   .night .h .t { font-size: 12px; color: var(--ink-3); }
@@ -202,23 +257,52 @@
 
   .empty { text-align: center; padding: 36px 18px 30px; border: 1px solid var(--line); border-radius: var(--radius); color: var(--ink-2); background: var(--surface); position: relative; overflow: hidden; }
   .empty .fan { display: flex; justify-content: center; gap: 0; margin-bottom: 18px; height: 78px; }
-  .empty .fan .mini { width: 50px; height: 70px; border-radius: 6px; background: linear-gradient(165deg, #fffdf8, var(--card-2)); color: var(--card-ink); font-family: var(--display); font-weight: 800; font-size: 20px; display: grid; place-items: center; box-shadow: 0 6px 16px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,0,0,0.4); margin: 0 -8px; transform-origin: 50% 120%; }
+  .empty .fan .mini { width: 50px; height: 70px; border-radius: 6px; background: linear-gradient(165deg, #fffdf8, var(--card-2)); color: var(--card-ink); font-family: var(--display); font-weight: 800; font-size: 20px; display: grid; place-items: center; box-shadow: 0 6px 16px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,0,0,0.4); margin: 0 -8px; transform-origin: 50% 120%; --r: 0deg; transform: rotate(var(--r)); }
   .empty .fan .mini.red { color: var(--card-red); }
-  .empty .fan .mini:nth-child(1) { transform: rotate(-16deg); } .empty .fan .mini:nth-child(2) { transform: rotate(-5deg); } .empty .fan .mini:nth-child(3) { transform: rotate(6deg); } .empty .fan .mini:nth-child(4) { transform: rotate(17deg); }
+  .empty .fan .mini:nth-child(1) { --r: -16deg; } .empty .fan .mini:nth-child(2) { --r: -5deg; } .empty .fan .mini:nth-child(3) { --r: 6deg; } .empty .fan .mini:nth-child(4) { --r: 17deg; }
+  .anim .empty .fan .mini { animation: fanFloat 3.5s ease-in-out infinite; animation-delay: calc(var(--k, 0) * -0.7s); }
+  @keyframes fanFloat { 0%, 100% { transform: rotate(var(--r)) translateY(0); } 50% { transform: rotate(var(--r)) translateY(-5px); } }
   .empty h2 { margin-bottom: 6px; font-size: 24px; color: var(--ink); }
   .empty p { margin: 0 0 16px; font-size: 14px; }
 
   /* ---------- FAB + footer ---------- */
-  .fab { position: fixed; right: 16px; bottom: 20px; z-index: 5; background: linear-gradient(180deg, var(--red-2), var(--red)); color: var(--ink); border: 0; border-radius: 999px; padding: 8px 20px 8px 8px; font-weight: 800; font-size: 15px; box-shadow: 0 12px 28px rgba(0,0,0,0.6), 0 0 0 1px var(--gold-deep), 0 0 0 3px rgba(214,178,90,0.18); display: inline-flex; gap: 10px; align-items: center; }
-  .fab:hover { filter: brightness(1.1); }
+  .fab { position: fixed; right: 16px; bottom: 20px; z-index: 5; background: linear-gradient(180deg, var(--red-2), var(--red)); color: var(--ink); border: 0; border-radius: 999px; padding: 8px 20px 8px 8px; font-weight: 800; font-size: 15px; box-shadow: 0 12px 28px rgba(0,0,0,0.6), 0 0 0 1px var(--gold-deep), 0 0 0 3px rgba(214,178,90,0.18); display: inline-flex; gap: 10px; align-items: center; transition: transform 0.2s var(--ease); }
+  .fab:hover { transform: translateY(-2px); }
+  .anim .fab { animation: pulse 2.6s ease-out infinite; }
+  @keyframes pulse { 0% { box-shadow: 0 12px 28px rgba(0,0,0,0.6), 0 0 0 1px var(--gold-deep), 0 0 0 3px rgba(214,178,90,0.4); } 70% { box-shadow: 0 12px 28px rgba(0,0,0,0.6), 0 0 0 1px var(--gold-deep), 0 0 0 16px rgba(214,178,90,0); } 100% { box-shadow: 0 12px 28px rgba(0,0,0,0.6), 0 0 0 1px var(--gold-deep), 0 0 0 16px rgba(214,178,90,0); } }
   .fab .chip-av { --sz: 34px; --c: var(--gold); box-shadow: none; }
+  .anim .fab:hover .chip-av { transform: rotate(180deg); }
   footer { margin-top: 40px; font-size: 12px; color: var(--ink-3); display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; }
   footer .links { display: flex; gap: 12px; flex-wrap: wrap; }
   footer button { background: none; border: 0; padding: 0; color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; font-size: 12px; }
   .mode-note { font-size: 12px; color: var(--ink-3); }
 
+  /* ---------- Intro ---------- */
+  .intro { position: fixed; inset: 0; z-index: 55; background: radial-gradient(ellipse 80% 60% at 50% 45%, #1b0609 0%, #0b0a0c 70%); display: grid; place-items: center; cursor: pointer; transition: opacity 0.6s ease, transform 0.6s ease; overflow: hidden; }
+  .intro.out { opacity: 0; transform: scale(1.04); pointer-events: none; }
+  .intro-stage { position: relative; width: min(92vw, 560px); text-align: center; perspective: 900px; }
+  .spot { position: absolute; left: 50%; top: 50%; width: 160vmax; height: 160vmax; transform: translate(-50%, -50%) scale(0); border-radius: 50%; background: radial-gradient(circle, rgba(180,28,43,0.5) 0%, rgba(180,28,43,0.14) 28%, transparent 58%); animation: spot 1.3s var(--ease) forwards; }
+  @keyframes spot { to { transform: translate(-50%, -50%) scale(1); } }
+  .deal { position: relative; display: flex; justify-content: center; gap: 14px; height: 146px; align-items: flex-end; transform-style: preserve-3d; }
+  .icard { --tilt: 0deg; width: 92px; height: 130px; position: relative; transform-style: preserve-3d; animation: dealIn 1s cubic-bezier(0.2, 0.9, 0.25, 1) both; }
+  .icard.c1 { --tilt: -12deg; animation-delay: 0.15s; } .icard.c2 { --tilt: 0deg; animation-delay: 0.35s; } .icard.c3 { --tilt: 12deg; animation-delay: 0.55s; }
+  .icard .face, .icard .back { position: absolute; inset: 0; border-radius: 10px; backface-visibility: hidden; -webkit-backface-visibility: hidden; box-shadow: 0 16px 40px rgba(0,0,0,0.65), 0 0 0 1px rgba(0,0,0,0.5); }
+  .icard .face { background: linear-gradient(165deg, #fffdf8, #ece5d3); color: #141216; font-family: var(--display); font-weight: 800; font-size: 46px; line-height: 1; display: grid; place-content: center; }
+  .icard .face .su { font-family: var(--body); font-size: 30px; display: block; line-height: 1; margin-top: 2px; }
+  .icard.red .face { color: #c0182a; }
+  .icard .back { transform: rotateY(180deg); background: repeating-linear-gradient(45deg, rgba(214,178,90,0.35) 0 2px, transparent 2px 9px), repeating-linear-gradient(-45deg, rgba(214,178,90,0.35) 0 2px, transparent 2px 9px), linear-gradient(#8f1521, #5c0c15); border: 4px solid #f3ecdc; outline: 1px solid var(--gold-deep); outline-offset: -8px; }
+  @keyframes dealIn { 0% { transform: translateY(70vh) rotate(-30deg) rotateY(180deg); opacity: 0; } 12% { opacity: 1; } 100% { transform: translateY(0) rotate(var(--tilt)) rotateY(0deg); opacity: 1; } }
+  .intro-title { font-family: var(--display); font-weight: 800; font-size: clamp(34px, 8vw, 68px); line-height: 1; margin: 28px 0 0; color: var(--ink); perspective: 600px; text-wrap: balance; }
+  .intro-title .L { display: inline-block; transform-origin: 50% 100%; animation: letter 0.6s var(--ease) both; animation-delay: calc(0.9s + var(--i) * 40ms); background: linear-gradient(100deg, #f3ecdc, #ffffff 30%, #f0d48a 55%, #d6b25a 75%, #f3ecdc); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  @keyframes letter { from { transform: rotateX(-90deg) translateY(12px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .intro-sub { margin-top: 14px; color: var(--red-hot); font-weight: 800; letter-spacing: 0.28em; text-transform: uppercase; font-size: 13px; text-shadow: 0 0 10px rgba(255,77,87,0.55); animation: fadeUp 0.6s var(--ease) both; animation-delay: 1.95s; }
+  .intro-skip { position: absolute; left: 0; right: 0; bottom: -80px; font-size: 11px; color: var(--ink-3); letter-spacing: 0.16em; text-transform: uppercase; animation: fadeUp 0.6s both; animation-delay: 1.2s; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
   /* ---------- Modal / form ---------- */
   dialog { border: 1px solid var(--gold-deep); border-radius: 18px; background: var(--bg-2); color: var(--ink); padding: 0; width: min(560px, calc(100vw - 20px)); max-height: calc(100dvh - 24px); box-shadow: var(--shadow), 0 0 0 4px rgba(214,178,90,0.12); }
+  .anim dialog[open] { animation: pop 0.35s var(--ease); }
+  @keyframes pop { from { transform: translateY(16px) scale(0.97); opacity: 0; } to { transform: none; opacity: 1; } }
   dialog::backdrop { background: rgba(0, 0, 0, 0.78); backdrop-filter: blur(3px); }
   .modal { display: flex; flex-direction: column; max-height: calc(100dvh - 26px); }
   .modal .mh { padding: 16px 18px 12px; display: flex; justify-content: space-between; align-items: center; gap: 10px; border-bottom: 1px solid var(--line); background: linear-gradient(180deg, rgba(143,21,33,0.35), transparent); }
@@ -232,7 +316,8 @@
   input[type="number"] { font-variant-numeric: tabular-nums; text-align: right; }
   input::placeholder { color: var(--ink-3); }
   .pick { display: flex; flex-wrap: wrap; gap: 6px; }
-  .pchip { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--line-strong); background: transparent; border-radius: 999px; padding: 4px 12px 4px 4px; font-size: 13px; font-weight: 700; color: var(--ink-2); }
+  .pchip { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--line-strong); background: transparent; border-radius: 999px; padding: 4px 12px 4px 4px; font-size: 13px; font-weight: 700; color: var(--ink-2); transition: transform 0.15s var(--ease), background 0.2s, border-color 0.2s; }
+  .pchip:active { transform: scale(0.96); }
   .pchip .chip-av { --sz: 26px; box-shadow: none; font-size: 10px; filter: grayscale(0.85) brightness(0.6); }
   .pchip[aria-pressed="true"] { background: rgba(214,178,90,0.12); border-color: var(--gold); color: var(--ink); }
   .pchip[aria-pressed="true"] .chip-av { filter: none; }
@@ -259,57 +344,66 @@
   .btn.secondary { background: rgba(255,255,255,0.08); color: var(--ink); }
   .warn { font-size: 13px; color: var(--red-hot); }
 
-  .toast { position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%); background: #050405; border: 1px solid var(--gold-deep); color: var(--ink); padding: 10px 14px; border-radius: 10px; font-size: 14px; font-weight: 700; box-shadow: var(--shadow); z-index: 20; max-width: calc(100vw - 32px); text-align: center; }
-  canvas.confetti { position: fixed; inset: 0; pointer-events: none; z-index: 30; }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .pcard { animation: deal 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
-    .pcard.k { animation-delay: 0.05s; } .pcard.a { animation-delay: 0.15s; } .pcard.q { animation-delay: 0.25s; }
-    @keyframes deal { from { transform: translateY(18px) rotate(var(--tilt, 0deg)); opacity: 0.6; } to { transform: translateY(0) rotate(var(--tilt, 0deg)); opacity: 1; } }
-  }
-  @media (prefers-reduced-motion: reduce) { canvas.confetti { display: none; } }
+  .toast { position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%); background: #050405; border: 1px solid var(--gold-deep); color: var(--ink); padding: 10px 14px; border-radius: 10px; font-size: 14px; font-weight: 700; box-shadow: var(--shadow); z-index: 70; max-width: calc(100vw - 32px); text-align: center; }
+  .anim .toast { animation: pop 0.35s var(--ease); }
 </style>
 
 <!-- Canonical data. The page rewrites exactly this block when it saves a new version. -->
 <script type="application/json" id="poker-data">{"version":1,"currency":"EUR","defaultBuyIn":10,"groupName":"Ein Spitzhackenschlag","players":[{"id":"valentin","name":"Valentin","color":"#C48800"},{"id":"phileas","name":"Phileas","color":"#3987E5"},{"id":"ayden","name":"Ayden","color":"#D95926"},{"id":"bardiya","name":"Bardiya","color":"#1F9AA8"},{"id":"benny","name":"Benny","color":"#E66767"},{"id":"kinan","name":"Kinan","color":"#9085E9"},{"id":"moritz","name":"Moritz","color":"#739A18"},{"id":"yannick","name":"Yannick","color":"#D55181"},{"id":"hooles","name":"Hooles","color":"#B8863F"}],"sessions":[]}</script>
 
+<div id="intro" class="intro" hidden aria-hidden="true">
+  <div class="intro-stage">
+    <div class="spot"></div>
+    <div class="deal">
+      <div class="icard c1 black"><div class="face">A<span class="su">♠</span></div><div class="back"></div></div>
+      <div class="icard c2 red"><div class="face">K<span class="su">♥</span></div><div class="back"></div></div>
+      <div class="icard c3 red"><div class="face">Q<span class="su">♦</span></div><div class="back"></div></div>
+    </div>
+    <h1 class="intro-title" id="intro-title"></h1>
+    <div class="intro-sub" id="intro-sub"></div>
+    <div class="intro-skip">Tippen zum Überspringen</div>
+  </div>
+</div>
+
 <div class="wrap">
   <header class="top">
-    <div class="banner">
+    <div class="banner" style="--i:0">
       <div class="banner-in">
+        <button type="button" class="rain-btn" id="rain-btn" hidden>Make it rain</button>
         <div class="brand">
           <div class="eyebrow">Privatrunde · Cash Game</div>
-          <h1><span class="s">♠</span> <span id="group-name">Ein Spitzhackenschlag</span></h1>
+          <h1><span class="s">♠</span> <span class="t" id="group-name">Ein Spitzhackenschlag</span></h1>
           <div class="subtitle" id="subtitle">Keiner mag Hooles</div>
         </div>
-        <div class="stack" aria-hidden="true">
+        <div class="stack" id="stack" title="Make it rain" aria-hidden="true">
           <span class="chip-av c4"></span><span class="chip-av c1"></span><span class="chip-av c2"></span><span class="chip-av c3"></span>
         </div>
       </div>
     </div>
-    <div class="summary" id="summary"></div>
+    <div class="ticker" style="--i:1" aria-hidden="true"><div class="ticker-track" id="ticker"></div></div>
+    <div class="summary" id="summary" style="--i:2"></div>
   </header>
 
-  <div id="empty" class="empty" hidden>
-    <div class="fan" aria-hidden="true"><span class="mini">A♠</span><span class="mini red">K♥</span><span class="mini red">Q♦</span><span class="mini">J♣</span></div>
+  <div id="empty" class="empty" hidden style="--i:3">
+    <div class="fan" aria-hidden="true"><span class="mini" style="--k:0">A♠</span><span class="mini red" style="--k:1">K♥</span><span class="mini red" style="--k:2">Q♦</span><span class="mini" style="--k:3">J♣</span></div>
     <h2>Noch kein Abend eingetragen</h2>
     <p>Nach dem ersten Pokerabend erscheinen hier Rangliste, Verlauf und Auszeichnungen.</p>
     <button class="btn secondary" id="demo-btn" type="button">Beispieldaten ansehen</button>
   </div>
 
   <div id="content">
-    <section id="sec-ranking">
+    <section id="sec-ranking" style="--i:3">
       <div class="sec-head"><h2><span class="suit b">♠</span>Rangliste</h2><span class="hint">Gesamtbilanz seit Start</span></div>
       <div class="hand" id="podium"></div>
       <ol class="ranking" id="ranking"></ol>
     </section>
 
-    <section id="sec-badges">
+    <section id="sec-badges" style="--i:4">
       <div class="sec-head"><h2><span class="suit r">♦</span>Auszeichnungen</h2><span class="hint">werden automatisch verliehen</span></div>
       <div class="badges" id="badges"></div>
     </section>
 
-    <section id="sec-chart">
+    <section id="sec-chart" style="--i:5">
       <div class="sec-head"><h2><span class="suit r">♥</span>Verlauf</h2><span class="hint">Bilanz Abend für Abend</span></div>
       <div class="chart-card" id="chart-card">
         <div id="chart"></div>
@@ -317,7 +411,7 @@
       </div>
     </section>
 
-    <section id="sec-log">
+    <section id="sec-log" style="--i:6">
       <div class="sec-head"><h2><span class="suit b">♣</span>Abende</h2><span class="hint" id="log-hint"></span></div>
       <div class="log" id="log"></div>
     </section>
@@ -326,6 +420,7 @@
   <footer>
     <div id="mode-note" class="mode-note"></div>
     <div class="links">
+      <button type="button" id="anim-btn">Animationen aus</button>
       <button type="button" id="export-btn">Daten exportieren</button>
       <button type="button" id="import-btn" hidden>Daten importieren</button>
       <button type="button" id="demo-off" hidden>Beispiel beenden</button>
@@ -404,14 +499,107 @@
   const initials = name => name.trim().slice(0, 2).toUpperCase();
   const round2 = v => Math.round(v * 100) / 100;
 
+  /* ---------- animation switches ---------- */
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let animOn = !reduced;
+  try { if (localStorage.getItem("poker:anim") === "off") animOn = false; } catch (e) { /* ignore */ }
+  document.documentElement.classList.toggle("anim", animOn);
+  let firstPaint = true;
+
   /* ---------- state ---------- */
   const dataEl = $("#poker-data");
   const baseState = JSON.parse(dataEl.textContent);
   let state = baseState;
-  let mode = "loading";       // loading | writer | reader | local | demo
+  let mode = "loading";
   let artifactNs = null;
-  let highlighted = null;     // Set of player ids highlighted in chart (null = auto top 3)
+  let highlighted = null;
   let openDetails = new Set();
+
+  /* ---------- chip rain (canvas) ---------- */
+  const rain = (() => {
+    const cv = document.createElement("canvas"); cv.className = "rain"; cv.setAttribute("aria-hidden", "true");
+    const ctx = cv.getContext("2d");
+    let W = 0, H = 0, parts = [], target = 0, raf = null, last = 0, paused = false;
+    const CHIPS = [["#17151a", "#f3ecdc"], ["#b41c2b", "#f3ecdc"], ["#d6b25a", "#17151a"], ["#f3ecdc", "#b41c2b"]];
+    const pick = a => a[Math.floor(Math.random() * a.length)];
+    function resize() { const dpr = Math.min(2, window.devicePixelRatio || 1); W = innerWidth; H = innerHeight; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); cv.style.width = W + "px"; cv.style.height = H + "px"; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); }
+    function spawn(o = {}) {
+      const u = Math.random();
+      const kind = u < 0.68 ? "chip" : u < 0.88 ? "note" : "coin";
+      const p = { kind, x: Math.random() * W, y: -40 - Math.random() * H * 0.4, vy: 110 + Math.random() * 150, vx: (Math.random() - 0.5) * 30, rot: Math.random() * Math.PI * 2, vr: (Math.random() - 0.5) * 3, ph: Math.random() * Math.PI * 2, vph: 1.4 + Math.random() * 2, r: 9 + Math.random() * 9, g: 0, col: o.colors ? pick(o.colors) : pick(CHIPS) };
+      if (kind === "note") { p.w = 34 + Math.random() * 12; p.h = p.w * 0.52; p.vy *= 0.55; p.vr *= 0.5; }
+      if (kind === "coin") { p.r = 6 + Math.random() * 4; p.vy *= 1.2; }
+      if (o.fill) { p.y = Math.random() * H; }
+      if (o.burst) { p.x = (o.x ?? W / 2) + (Math.random() - 0.5) * 60; p.y = o.y ?? H * 0.62; p.vy = -(280 + Math.random() * 380); p.vx = (Math.random() - 0.5) * 460; p.g = 900; }
+      parts.push(p);
+    }
+    function rr(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+    function drawChip(p) {
+      const s = Math.max(0.16, Math.abs(Math.cos(p.ph)));
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.scale(1, s);
+      const [c, spot] = p.col;
+      ctx.beginPath(); ctx.arc(0, 0, p.r, 0, Math.PI * 2); ctx.fillStyle = c; ctx.fill();
+      ctx.lineWidth = 1; ctx.strokeStyle = "rgba(0,0,0,0.5)"; ctx.stroke();
+      ctx.strokeStyle = spot; ctx.lineWidth = p.r * 0.3;
+      for (let i = 0; i < 8; i++) { const a0 = i * Math.PI / 4 - 0.17; ctx.beginPath(); ctx.arc(0, 0, p.r * 0.84, a0, a0 + 0.34); ctx.stroke(); }
+      ctx.beginPath(); ctx.arc(0, 0, p.r * 0.6, 0, Math.PI * 2); ctx.strokeStyle = "rgba(255,255,255,0.35)"; ctx.lineWidth = 1; ctx.stroke();
+      ctx.restore();
+    }
+    function drawNote(p) {
+      const s = Math.max(0.1, Math.abs(Math.cos(p.ph)));
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.scale(1, s);
+      ctx.fillStyle = "#f3ecdc"; rr(-p.w / 2, -p.h / 2, p.w, p.h, 3); ctx.fill();
+      ctx.strokeStyle = "#b41c2b"; ctx.lineWidth = 1; rr(-p.w / 2 + 3, -p.h / 2 + 3, p.w - 6, p.h - 6, 2); ctx.stroke();
+      ctx.fillStyle = "#b41c2b"; ctx.font = `800 ${Math.round(p.h * 0.62)}px Manrope, sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("€", 0, 1);
+      ctx.restore();
+    }
+    function drawCoin(p) {
+      const s = Math.max(0.16, Math.abs(Math.cos(p.ph)));
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.scale(1, s);
+      ctx.beginPath(); ctx.arc(0, 0, p.r, 0, Math.PI * 2); ctx.fillStyle = "#e0bd63"; ctx.fill(); ctx.strokeStyle = "#8a6a2a"; ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.fillStyle = "#8a6a2a"; ctx.font = `800 ${Math.round(p.r * 1.3)}px Manrope, sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("€", 0, 1);
+      ctx.restore();
+    }
+    function frame(t) {
+      raf = null;
+      const dt = Math.min(0.05, (t - last) / 1000 || 0.016); last = t;
+      ctx.clearRect(0, 0, W, H);
+      while (parts.length < target) spawn();
+      for (let i = parts.length - 1; i >= 0; i--) {
+        const p = parts[i];
+        if (p.g) p.vy += p.g * dt;
+        p.y += p.vy * dt; p.x += p.vx * dt + Math.sin(p.ph) * 22 * dt; p.rot += p.vr * dt; p.ph += p.vph * dt;
+        if (p.y > H + 70 || p.x < -90 || p.x > W + 90) { parts.splice(i, 1); continue; }
+        if (p.kind === "chip") drawChip(p); else if (p.kind === "note") drawNote(p); else drawCoin(p);
+      }
+      if (parts.length || target) raf = requestAnimationFrame(frame);
+    }
+    function kick() { if (!raf && !paused) { last = performance.now(); raf = requestAnimationFrame(frame); } }
+    return {
+      mount() { document.body.append(cv); resize(); addEventListener("resize", resize); },
+      setTarget(n) { target = n; kick(); },
+      burst(n, colors, x, y) { for (let i = 0; i < n; i++) spawn({ burst: true, colors, x, y }); kick(); },
+      fill(n) { for (let i = 0; i < n; i++) spawn({ fill: true }); kick(); },
+      pause(v) { paused = v; if (!v) kick(); else if (raf) { cancelAnimationFrame(raf); raf = null; } },
+      front(v) { cv.classList.toggle("front", v); },
+    };
+  })();
+  let ambient = 0;
+  function rainAmbient(n) { ambient = n; rain.setTarget(n); }
+  let stormTimer = null;
+  function storm(n, ms, colors, x, y) {
+    if (!animOn) return;
+    rain.front(true); rain.burst(n, colors, x, y); rain.setTarget(Math.max(ambient, 70));
+    clearTimeout(stormTimer); stormTimer = setTimeout(() => { rain.setTarget(ambient); setTimeout(() => rain.front(false), 2200); }, ms);
+  }
+
+  /* ---------- count-up numbers ---------- */
+  function countUp(elm, to, format, dur = 1100) {
+    if (!animOn || !firstPaint || Math.abs(to) < 0.005) { elm.textContent = format(to); return; }
+    const t0 = performance.now();
+    const step = t => { const k = Math.min(1, (t - t0) / dur); const e = 1 - Math.pow(1 - k, 3); elm.textContent = format(to * e); if (k < 1) requestAnimationFrame(step); else elm.textContent = format(to); };
+    requestAnimationFrame(step);
+  }
 
   /* ---------- statistics (pure) ---------- */
   function computeStats(st) {
@@ -513,13 +701,29 @@
   function renderSummary(S) {
     const last = S.sessions[S.sessions.length - 1];
     const lastWinner = last ? playerById(last.winner) : null;
-    const tiles = [
-      [String(S.sessions.length), S.sessions.length === 1 ? "Abend gespielt" : "Abende gespielt"],
-      [fmt(S.totalPot, false).replace("−", ""), "Euro auf dem Tisch"],
-      [lastWinner ? lastWinner.name : "—", last ? `Sieger am ${shortDate(last.date)}` : "letzter Sieger"],
-    ];
     const box = $("#summary"); box.replaceChildren();
-    for (const [v, l] of tiles) box.append(el("div", { class: "tile" }, el("div", { class: "v num" }, v), el("div", { class: "l" }, l)));
+    const tile = (l) => { const v = el("div", { class: "v num" }); box.append(el("div", { class: "tile" }, v, el("div", { class: "l" }, l))); return v; };
+    countUp(tile(S.sessions.length === 1 ? "Abend" : "Abende"), S.sessions.length, v => String(Math.round(v)));
+    countUp(tile("auf dem Tisch"), S.totalPot, v => fmt(v, false));
+    tile(last ? `Sieger ${shortDate(last.date)}` : "letzter Sieger").textContent = lastWinner ? lastWinner.name : "—";
+  }
+
+  function renderTicker(S) {
+    const t = $("#ticker"); t.replaceChildren();
+    const items = [];
+    const lead = S.ranked[0], fish = S.ranked[S.ranked.length - 1], last = S.sessions[S.sessions.length - 1];
+    if (lead && lead.balance > 0) items.push(`${playerById(lead.id).name} führt mit ${fmt(lead.balance)}`);
+    if (fish && fish.balance < 0 && S.ranked.length >= 3) items.push(`Der Fisch: ${playerById(fish.id).name} mit ${fmt(fish.balance)}`);
+    if (last) items.push(`Letzter Sieger: ${playerById(last.winner).name} am ${shortDate(last.date)}`);
+    const hot = S.ranked.filter(r => r.streak >= 2).sort((a, b) => b.streak - a.streak)[0];
+    if (hot) items.push(`${playerById(hot.id).name}: ${hot.streak} Siege in Folge`);
+    if (S.sessions.length) items.push(`${S.sessions.length} Abende · ${fmt(S.totalPot, false)} auf dem Tisch`); else items.push("Noch kein Abend eingetragen");
+    items.push($("#subtitle").textContent);
+    items.push(`Buy-in ${fmt(state.defaultBuyIn, false)} · Rebuy erlaubt`);
+    const suits = ["♠", "♥", "♦", "♣"];
+    const build = () => items.flatMap((s, i) => [el("span", { class: i % 3 === 0 ? "hi" : "" }, s), el("span", { class: "sep" }, suits[i % 4])]);
+    t.append(...build(), ...build());
+    t.style.setProperty("--dur", Math.max(24, items.join("").length * 0.45) + "s");
   }
 
   function renderPodium(S) {
@@ -527,17 +731,19 @@
     const top = S.ranked.slice(0, 3);
     if (top.length < 3) { box.hidden = true; return; }
     box.hidden = false;
-    const spec = [[top[1], "k red", "K", "♥", "Zweiter"], [top[0], "a black", "A", "♠", "Erster"], [top[2], "q red", "Q", "♦", "Dritter"]];
-    for (const [r, k, rank, suit, place] of spec) {
+    const spec = [[top[1], "k red", "K", "♥", "Zweiter", 1], [top[0], "a black", "A", "♠", "Erster", 0], [top[2], "q red", "Q", "♦", "Dritter", 2]];
+    for (const [r, k, rank, suit, place, i] of spec) {
       const p = playerById(r.id);
-      const idx = cl => el("span", { class: `idx ${cl}`, "aria-hidden": "true" }, rank, el("span", { class: "su" }, suit));
-      const card = el("div", { class: `pcard ${k}` }, idx("tl"), idx("br"));
+      const idx = c => el("span", { class: `idx ${c}`, "aria-hidden": "true" }, rank, el("span", { class: "su" }, suit));
+      const card = el("div", { class: "pcard" }, idx("tl"), idx("br"));
       if (k.startsWith("a")) card.append(crownSvg());
+      const bal = el("div", { class: `bal num ${cls(r.balance)}` });
       card.append(el("span", { class: "place" }, place), chip(p, k.startsWith("a") ? "xl" : "lg"),
-        el("div", { class: "name" }, p.name),
-        el("div", { class: `bal num ${cls(r.balance)}` }, fmt(r.balance)),
-        el("div", { class: "meta" }, `${r.played} Abende · ${Math.round(r.winRate * 100)} % gewonnen`));
-      box.append(card);
+        el("div", { class: "name" }, p.name), bal,
+        el("div", { class: "meta" }, `${r.played} Abende · ${Math.round(r.winRate * 100)} % gewonnen`),
+        el("div", { class: "pback", "aria-hidden": "true" }, "♠"));
+      countUp(bal, r.balance, v => fmt(v), 1300);
+      box.append(el("div", { class: `slot ${k} ${firstPaint ? "enter" : ""}`, style: `--i:${i}` }, card));
     }
   }
 
@@ -556,9 +762,9 @@
   function renderRanking(S) {
     const list = $("#ranking"); list.replaceChildren();
     const rows = [...S.ranked, ...S.unranked];
-    rows.forEach((r) => {
+    rows.forEach((r, i) => {
       const p = playerById(r.id);
-      const li = el("li");
+      const li = el("li", { class: firstPaint ? "enter" : "", style: `--i:${i}` });
       const isLast = r.rank !== null && r.rank === S.ranked.length && S.ranked.length >= 3 && r.balance < 0;
       const meta = el("div", { class: "m" });
       if (r.rank === null) meta.append("noch nie dabei");
@@ -569,11 +775,13 @@
         if (isLast) meta.append(el("span", { class: "fish" }, "🐟 Der Fisch"));
       }
       const trend = r.move === null ? null : el("span", { class: `trend ${r.move > 0 ? "up" : r.move < 0 ? "down" : "flat"}` }, r.move > 0 ? `▲ ${r.move}` : r.move < 0 ? `▼ ${-r.move}` : "=");
+      const bal = el("span", { class: `bal num ${cls(r.balance)}` });
       const btn = el("button", { class: `row ${r.rank === null ? "unranked" : ""}`, type: "button", "aria-expanded": openDetails.has(r.id) ? "true" : "false", onclick: () => { openDetails.has(r.id) ? openDetails.delete(r.id) : openDetails.add(r.id); renderRanking(S); } },
         el("span", { class: "pos num" }, r.rank === null ? "–" : `${r.rank}`),
         chip(p, "sm"),
         el("span", { class: "who" }, el("span", { class: "n" }, p.name, " ", trend), meta),
-        el("span", { class: `bal num ${cls(r.balance)}` }, r.rank === null ? "" : fmt(r.balance)));
+        bal);
+      if (r.rank !== null) countUp(bal, r.balance, v => fmt(v), 1200);
       li.append(btn);
       if (openDetails.has(r.id) && r.rank !== null) {
         const st = (v, l) => el("div", { class: "s" }, el("div", { class: "v num" }, v), el("div", { class: "l" }, l));
@@ -595,14 +803,14 @@
 
   function renderBadges(S) {
     const box = $("#badges"); box.replaceChildren();
-    for (const b of computeBadges(S)) {
+    computeBadges(S).forEach((b, i) => {
       const p = b.who ? playerById(b.who) : null;
       box.append(el("div", { class: `badge ${p ? "" : "empty"}` },
-        el("div", { class: "medal", style: `--c:${b.c}`, "aria-hidden": "true" }, el("span", {}, b.ic)),
+        el("div", { class: `medal ${firstPaint ? "enter" : ""}`, style: `--c:${b.c};--i:${i}`, "aria-hidden": "true" }, el("span", {}, b.ic)),
         el("div", { class: "t" }, b.t),
         p ? el("div", { class: "who" }, chip(p, "sm"), p.name) : el("div", { class: "who", style: "color:var(--ink-3)" }, "noch offen"),
         el("div", { class: "why" }, b.why)));
-    }
+    });
   }
 
   /* ---------- line chart ---------- */
@@ -640,10 +848,12 @@
       t.textContent = shortDate(s.date); svg.append(t);
     });
     const ordered = [...series.filter(s => !s.hl), ...series.filter(s => s.hl)];
+    const drawn = [];
     for (const s of ordered) {
       if (s.curve.length < 2) continue;
       const d = s.curve.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
-      svg.append(g("path", { d, fill: "none", stroke: s.hl ? s.p.color : "rgba(243,236,220,0.18)", "stroke-width": s.hl ? 2.5 : 1.5, "stroke-linejoin": "round", "stroke-linecap": "round" }));
+      const path = g("path", { d, fill: "none", stroke: s.hl ? s.p.color : "rgba(243,236,220,0.18)", "stroke-width": s.hl ? 2.5 : 1.5, "stroke-linejoin": "round", "stroke-linecap": "round" });
+      svg.append(path); drawn.push([path, s.hl]);
       const lastV = s.curve[s.curve.length - 1];
       if (s.hl) svg.append(g("circle", { cx: x(n), cy: y(lastV), r: 4.5, fill: s.p.color, stroke: "#17161a", "stroke-width": 2 }));
     }
@@ -659,6 +869,15 @@
     const hit = g("rect", { x: padL, y: 0, width: W - padL - padR, height: H, fill: "transparent" });
     svg.append(hit);
     host.append(svg);
+    if (animOn) {
+      let k = 0;
+      for (const [path, isHl] of drawn) {
+        const L = path.getTotalLength();
+        path.style.strokeDasharray = L; path.style.strokeDashoffset = L;
+        const a = path.animate([{ strokeDashoffset: L }, { strokeDashoffset: 0 }], { duration: isHl ? 1500 : 900, delay: isHl ? 150 + k++ * 120 : 0, easing: "cubic-bezier(0.2,0.8,0.2,1)", fill: "forwards" });
+        a.onfinish = () => { path.style.strokeDasharray = ""; path.style.strokeDashoffset = ""; };
+      }
+    }
     const tip = el("div", { class: "tip" }); tip.hidden = true; $("#chart-card").append(tip);
     const showAt = (clientX) => {
       const rect = svg.getBoundingClientRect();
@@ -714,24 +933,29 @@
     }
   }
 
+  function applyMode() {
+    $("#demo-off").hidden = mode !== "demo";
+    $("#fab").hidden = !(mode === "writer" || mode === "local");
+    $("#import-btn").hidden = !(mode === "writer" || mode === "local");
+    $("#rain-btn").hidden = !animOn;
+    $("#anim-btn").textContent = animOn ? "Animationen aus" : "Animationen an";
+    $("#mode-note").textContent = mode === "reader" ? "Nur Ansicht. Eintragen kann nur der Besitzer der Seite." : mode === "local" ? "Lokaler Modus: Daten liegen nur in diesem Browser." : mode === "demo" ? "Beispieldaten. Nichts davon wird gespeichert." : "";
+  }
   function renderAll() {
     const S = computeStats(state);
     $("#group-name").textContent = state.groupName || "Ein Spitzhackenschlag";
-    renderSummary(S);
+    renderSummary(S); renderTicker(S);
     const hasData = S.sessions.length > 0;
     $("#empty").hidden = hasData;
     $("#content").hidden = !hasData;
     if (hasData) { renderPodium(S); renderRanking(S); renderBadges(S); renderChart(S); renderLog(S); }
-    $("#demo-off").hidden = mode !== "demo";
-    $("#fab").hidden = !(mode === "writer" || mode === "local");
-    $("#import-btn").hidden = !(mode === "writer" || mode === "local");
-    $("#mode-note").textContent = mode === "reader" ? "Nur Ansicht. Eintragen kann nur der Besitzer der Seite." : mode === "local" ? "Lokaler Modus: Daten liegen nur in diesem Browser." : mode === "demo" ? "Beispieldaten. Nichts davon wird gespeichert." : "";
+    applyMode();
   }
 
   /* ---------- persistence ---------- */
   const MARK = /(<script type="application\/json" id="poker-data">)([\s\S]*?)(<\/script>)/;
   async function persist(next, celebrate) {
-    if (mode === "demo") { state = next; renderAll(); return; }
+    if (mode === "demo") { state = next; renderAll(); if (celebrate) celebrateNow(celebrate); return; }
     if (mode === "local") { try { localStorage.setItem(LS_KEY, JSON.stringify(next)); } catch (e) { /* ignore */ } state = next; renderAll(); if (celebrate) celebrateNow(celebrate); return; }
     if (mode !== "writer" || !artifactNs) throw { code: "not_writer" };
     const res = await fetch(location.pathname + location.search, { cache: "no-store" });
@@ -835,7 +1059,7 @@
     const best = entries.reduce((a, b) => (b.cashOut - b.buyIn) > (a.cashOut - a.buyIn) ? b : a);
     const celebrate = editing ? null : { winner: best.player, net: round2(best.cashOut - best.buyIn), date };
     $("#save").disabled = true; $("#save").textContent = "Speichern…";
-    try { await persist(next, celebrate); dlg.close(); if (mode !== "writer") toast(editing ? "Abend aktualisiert." : "Abend gespeichert."); }
+    try { await persist(next, celebrate); dlg.close(); if (mode !== "writer" && !celebrate) toast("Abend aktualisiert."); }
     catch (err) { handleSaveError(err); }
     finally { $("#save").disabled = false; $("#save").textContent = "Speichern"; }
   });
@@ -892,10 +1116,10 @@
   }
   function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
   let modeBeforeDemo = null;
-  $("#demo-btn").addEventListener("click", () => { modeBeforeDemo = mode; mode = "demo"; state = demoState(); highlighted = null; renderAll(); window.scrollTo({ top: 0 }); });
+  $("#demo-btn").addEventListener("click", () => { modeBeforeDemo = mode; mode = "demo"; state = demoState(); highlighted = null; firstPaint = true; renderAll(); setTimeout(() => { firstPaint = false; }, 2500); storm(80, 1800); window.scrollTo({ top: 0, behavior: animOn ? "smooth" : "auto" }); });
   $("#demo-off").addEventListener("click", () => { mode = modeBeforeDemo || "reader"; state = loadState(); highlighted = null; renderAll(); });
 
-  /* ---------- toast + confetti ---------- */
+  /* ---------- toast + celebration ---------- */
   let toastTimer = null;
   function toast(msg) {
     let t = $(".toast"); if (!t) { t = el("div", { class: "toast", role: "status" }); document.body.append(t); }
@@ -904,21 +1128,55 @@
   function celebrateNow(c) {
     const p = playerById(c.winner);
     toast(p ? `Abend gespeichert. Sieger: ${p.name} mit ${fmt(c.net)}` : "Abend gespeichert.");
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const cv = el("canvas", { class: "confetti" }); document.body.append(cv);
-    const ctx = cv.getContext("2d"); cv.width = innerWidth; cv.height = innerHeight;
-    const colors = [p ? p.color : "#d6b25a", "#d6b25a", "#f3ecdc", "#b41c2b"];
-    const parts = Array.from({ length: 140 }, () => ({ x: cv.width / 2 + (Math.random() - 0.5) * 120, y: cv.height * 0.55, vx: (Math.random() - 0.5) * 14, vy: -Math.random() * 16 - 6, r: 4 + Math.random() * 5, c: colors[Math.floor(Math.random() * colors.length)], a: Math.random() * Math.PI, s: (Math.random() - 0.5) * 0.3 }));
-    let t0 = performance.now();
-    const tick = now => {
-      const dt = Math.min(32, now - t0) / 16; t0 = now;
-      ctx.clearRect(0, 0, cv.width, cv.height);
-      let alive = 0;
-      for (const q of parts) { q.vy += 0.45 * dt; q.x += q.vx * dt; q.y += q.vy * dt; q.a += q.s; q.vx *= 0.99; if (q.y < cv.height + 20) alive++; ctx.save(); ctx.translate(q.x, q.y); ctx.rotate(q.a); ctx.fillStyle = q.c; ctx.fillRect(-q.r / 2, -q.r / 4, q.r, q.r / 2); ctx.restore(); }
-      if (alive) requestAnimationFrame(tick); else cv.remove();
-    };
-    requestAnimationFrame(tick);
+    if (!animOn) return;
+    const colors = p ? [[p.color, "#f3ecdc"], ["#d6b25a", "#17151a"], [p.color, "#f3ecdc"], ["#f3ecdc", "#b41c2b"]] : undefined;
+    storm(220, 3200, colors);
+    setTimeout(() => rain.burst(120, colors, innerWidth * 0.25, innerHeight * 0.7), 500);
+    setTimeout(() => rain.burst(120, colors, innerWidth * 0.75, innerHeight * 0.7), 1000);
   }
+
+  /* ---------- intro ---------- */
+  let introTimer = null;
+  function playIntro() {
+    const box = $("#intro");
+    const title = $("#intro-title"); title.replaceChildren();
+    const name = state.groupName || "Ein Spitzhackenschlag";
+    let i = 0;
+    for (const word of name.split(" ")) {
+      const w = el("span", { style: "display:inline-block; white-space:nowrap" });
+      for (const ch of word) w.append(el("span", { class: "L", style: `--i:${i++}` }, ch));
+      title.append(w, " ");
+    }
+    $("#intro-sub").textContent = $("#subtitle").textContent;
+    box.hidden = false;
+    rain.front(true); rain.fill(70); rain.setTarget(110);
+    const total = 1.1 + i * 0.04 + 1.3;
+    introTimer = setTimeout(() => finishIntro(false), total * 1000);
+    box.addEventListener("click", () => finishIntro(false), { once: true });
+  }
+  function finishIntro(immediate) {
+    clearTimeout(introTimer);
+    const box = $("#intro");
+    if (box && !box.hidden) {
+      if (immediate) box.remove();
+      else { box.classList.add("out"); setTimeout(() => box.remove(), 650); }
+    } else if (box) box.remove();
+    try { sessionStorage.setItem("poker:intro", "1"); } catch (e) { /* ignore */ }
+    rain.front(false);
+    rainAmbient(animOn ? 14 : 0);
+    document.documentElement.classList.add("ready");
+    setTimeout(() => { firstPaint = false; }, 2600);
+  }
+
+  /* ---------- extras ---------- */
+  $("#rain-btn").addEventListener("click", e => { const r = e.currentTarget.getBoundingClientRect(); storm(140, 2600, undefined, r.left + r.width / 2, r.top + r.height / 2); });
+  $("#stack").addEventListener("click", e => { const r = e.currentTarget.getBoundingClientRect(); storm(120, 2200, undefined, r.left + r.width / 2, r.top + r.height / 2); });
+  $("#anim-btn").addEventListener("click", () => { try { localStorage.setItem("poker:anim", animOn ? "off" : "on"); } catch (e) { /* ignore */ } location.reload(); });
+  if (animOn && window.matchMedia("(pointer: fine)").matches) {
+    let mt = null;
+    addEventListener("pointermove", e => { if (mt) return; mt = requestAnimationFrame(() => { mt = null; document.documentElement.style.setProperty("--mx", e.clientX + "px"); document.documentElement.style.setProperty("--my", e.clientY + "px"); }); });
+  }
+  document.addEventListener("visibilitychange", () => rain.pause(document.hidden));
 
   /* ---------- boot ---------- */
   function loadState() {
@@ -928,15 +1186,16 @@
   const inShell = typeof window.claude === "object" && window.claude && typeof window.claude.use === "function";
   if (!inShell) { mode = "local"; state = loadState(); }
   else { mode = "reader"; }
+  rain.mount();
   renderAll();
-  try {
-    const c = sessionStorage.getItem("poker:celebrate");
-    if (c) { sessionStorage.removeItem("poker:celebrate"); setTimeout(() => celebrateNow(JSON.parse(c)), 400); }
-  } catch (e) { /* ignore */ }
+  let celebrate = null, introSeen = false;
+  try { celebrate = sessionStorage.getItem("poker:celebrate"); if (celebrate) sessionStorage.removeItem("poker:celebrate"); introSeen = !!sessionStorage.getItem("poker:intro"); } catch (e) { /* ignore */ }
+  if (animOn && !introSeen && !celebrate) playIntro(); else finishIntro(true);
+  if (celebrate) setTimeout(() => { try { celebrateNow(JSON.parse(celebrate)); } catch (e) { /* ignore */ } }, 500);
   if (inShell) {
     window.claude.use("artifact").then(ns => {
       artifactNs = ns;
-      if (ns) { mode = "writer"; renderAll(); }
+      if (ns) { mode = "writer"; applyMode(); if (!$("#content").hidden) renderLog(computeStats(state)); }
     }).catch(() => {});
   }
   let rt = null;
