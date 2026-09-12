@@ -3,8 +3,8 @@
 Poker-Rangliste der Freundesrunde (Cash Game, 9 Spieler, Standard-Buy-in 10 €).
 Eine einzelne HTML-Seite, veröffentlicht als Claude-Artefakt:
 https://claude.ai/code/artifact/d1162e97-072f-42a1-b4fb-e665bec6b0b1
- Valentin trägt nach jedem Abend
-ein, die Freunde öffnen den Link am Handy.
+
+Valentin trägt nach jedem Abend ein, die Freunde öffnen den Link am Handy.
 
 ## Wie es funktioniert
 
