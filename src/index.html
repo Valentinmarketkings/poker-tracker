@@ -350,7 +350,7 @@
 </style>
 
 <!-- Canonical data. The page rewrites exactly this block when it saves a new version. -->
-<script type="application/json" id="poker-data">{"version":1,"currency":"EUR","defaultBuyIn":10,"groupName":"Ein Spitzhacken schlag","players":[{"id":"valentin","name":"Valentin","color":"#C48800"},{"id":"phileas","name":"Phileas","color":"#3987E5"},{"id":"ayden","name":"Ayden","color":"#D95926"},{"id":"bardiya","name":"Bardiya","color":"#1F9AA8"},{"id":"benny","name":"Benny","color":"#E66767"},{"id":"kinan","name":"Kinan","color":"#9085E9"},{"id":"moritz","name":"Moritz","color":"#739A18"},{"id":"yannick","name":"Yannick","color":"#D55181"},{"id":"hooles","name":"Hooles","color":"#B8863F"},{"id":"lennard","name":"Lennard","color":"#B05CC4"}],"sessions":[]}</script>
+<script type="application/json" id="poker-data">{"version":1,"currency":"EUR","defaultBuyIn":10,"groupName":"Ein Spitzhacken schlag","players":[{"id":"valentin","name":"Valentin","color":"#C48800"},{"id":"phileas","name":"Phileas","color":"#3987E5"},{"id":"ayden","name":"Ayden","color":"#D95926"},{"id":"bardiya","name":"Bardiya","color":"#1F9AA8"},{"id":"benny","name":"Benny","color":"#E66767"},{"id":"kinan","name":"Kinan","color":"#9085E9"},{"id":"moritz","name":"Moritz","color":"#739A18"},{"id":"yannick","name":"Yannick","color":"#D55181"},{"id":"hooles","name":"Hooles","color":"#B8863F"},{"id":"lennard","name":"Lennard","color":"#B05CC4"}],"sessions":[{"id":"2026-09-12-erste","date":"2026-09-12","title":"","entries":[{"player":"valentin","buyIn":10,"cashOut":20},{"player":"phileas","buyIn":10,"cashOut":0},{"player":"bardiya","buyIn":10,"cashOut":30},{"player":"yannick","buyIn":10,"cashOut":0},{"player":"lennard","buyIn":10,"cashOut":0}]}]}</script>
 
 <div id="intro" class="intro" hidden aria-hidden="true">
   <div class="intro-stage">
@@ -677,18 +677,20 @@
     const played = S.ranked;
     const pick = (arr, key, dir = 1) => arr.length ? arr.reduce((a, b) => (dir * (key(b) - key(a)) > 0 ? b : a)) : null;
     const add = (ic, t, r, why, c) => list.push({ ic, t, who: r ? r.id : null, why, c });
-    const top = played[0];
+    const unique = r => r && played.filter(x => x.balance === r.balance).length === 1;
+    const top = unique(played[0]) ? played[0] : null;
     add("🏦", "Bankomat", top && top.balance > 0 ? top : null, top && top.balance > 0 ? `${fmt(top.balance)} gesamt` : "noch niemand im Plus", "#17151a");
-    const bottom = played[played.length - 1];
-    add("💸", "Spendabler Sponsor", bottom && bottom.balance < 0 ? bottom : null, bottom && bottom.balance < 0 ? `${fmt(bottom.balance)} gesamt` : "noch niemand im Minus", "#8f1521");
+    const bottom = unique(played[played.length - 1]) ? played[played.length - 1] : null;
+    add("💸", "Spendabler Sponsor", bottom && bottom.balance < 0 ? bottom : null, bottom && bottom.balance < 0 ? `${fmt(bottom.balance)} gesamt` : "noch niemand eindeutig im Minus", "#8f1521");
     const hot = pick(played.filter(r => r.streak >= 2), r => r.streak);
     add("🔥", "Heißeste Hand", hot, hot ? `${hot.streak} Siege in Folge` : "ab 2 Siegen in Folge", "#8f1521");
     const roller = pick(played.filter(r => r.best > 0), r => r.best);
     add("💎", "High Roller", roller, roller ? `${fmt(roller.best)} an einem Abend` : "größter Einzelgewinn", "#17151a");
     const coaster = pick(played.filter(r => r.played >= 3), r => r.sd);
     add("🎢", "Achterbahn", coaster, coaster ? `Schwankung ±${fmt(coaster.sd, false)}` : "ab 3 Abenden", "#8f1521");
-    const regular = pick(played, r => r.played);
-    add("🪑", "Stammgast", regular, regular ? `${regular.played} von ${S.sessions.length} Abenden` : "meiste Abende", "#17151a");
+    const regular0 = pick(played, r => r.played);
+    const regular = regular0 && played.filter(x => x.played === regular0.played).length === 1 ? regular0 : null;
+    add("🪑", "Stammgast", regular, regular ? `${regular.played} von ${S.sessions.length} Abenden` : "meiste Abende, noch unentschieden", "#17151a");
     const all = [...played, ...S.unranked];
     const ghost = S.sessions.length >= 2 ? pick(all, r => -r.played) : null;
     add("👻", "Phantom", ghost, ghost ? (ghost.played ? `nur ${ghost.played} Abend${ghost.played > 1 ? "e" : ""}` : "noch nie dabei") : "ab 2 Abenden", "#17151a");
@@ -721,11 +723,11 @@
     const items = [];
     const lead = S.ranked[0], fish = S.ranked[S.ranked.length - 1], last = S.sessions[S.sessions.length - 1];
     if (lead && lead.balance > 0) items.push(`${playerById(lead.id).name} führt mit ${fmt(lead.balance)}`);
-    if (fish && fish.balance < 0 && S.ranked.length >= 3) items.push(`Der Fisch: ${playerById(fish.id).name} mit ${fmt(fish.balance)}`);
+    if (fish && fish.balance < 0 && S.ranked.length >= 3 && S.ranked.filter(x => x.balance === fish.balance).length === 1) items.push(`Der Fisch: ${playerById(fish.id).name} mit ${fmt(fish.balance)}`);
     if (last) items.push(`Letzter Sieger: ${playerById(last.winner).name} am ${shortDate(last.date)}`);
     const hot = S.ranked.filter(r => r.streak >= 2).sort((a, b) => b.streak - a.streak)[0];
     if (hot) items.push(`${playerById(hot.id).name}: ${hot.streak} Siege in Folge`);
-    if (S.sessions.length) items.push(`${S.sessions.length} Abende · ${fmt(S.totalPot, false)} auf dem Tisch`); else items.push("Noch kein Abend eingetragen");
+    if (S.sessions.length) items.push(`${S.sessions.length} ${S.sessions.length === 1 ? "Abend" : "Abende"} · ${fmt(S.totalPot, false)} auf dem Tisch`); else items.push("Noch kein Abend eingetragen");
     items.push($("#subtitle").textContent);
     items.push(`Buy-in ${fmt(state.defaultBuyIn, false)} · Rebuy erlaubt`);
     const suits = ["♠", "♥", "♦", "♣"];
@@ -773,7 +775,7 @@
     rows.forEach((r, i) => {
       const p = playerById(r.id);
       const li = el("li", { class: firstPaint ? "enter" : "", style: `--i:${i}` });
-      const isLast = r.rank !== null && r.rank === S.ranked.length && S.ranked.length >= 3 && r.balance < 0;
+      const isLast = r.rank !== null && r.rank === S.ranked.length && S.ranked.length >= 3 && r.balance < 0 && S.ranked.filter(x => x.balance === r.balance).length === 1;
       const meta = el("div", { class: "m" });
       if (r.rank === null) meta.append("noch nie dabei");
       else {

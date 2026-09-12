@@ -55,5 +55,38 @@
       "color": "#B05CC4"
     }
   ],
-  "sessions": []
+  "sessions": [
+    {
+      "id": "2026-09-12-erste",
+      "date": "2026-09-12",
+      "title": "",
+      "entries": [
+        {
+          "player": "valentin",
+          "buyIn": 10,
+          "cashOut": 20
+        },
+        {
+          "player": "phileas",
+          "buyIn": 10,
+          "cashOut": 0
+        },
+        {
+          "player": "bardiya",
+          "buyIn": 10,
+          "cashOut": 30
+        },
+        {
+          "player": "yannick",
+          "buyIn": 10,
+          "cashOut": 0
+        },
+        {
+          "player": "lennard",
+          "buyIn": 10,
+          "cashOut": 0
+        }
+      ]
+    }
+  ]
 }
