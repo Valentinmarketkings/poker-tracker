@@ -1,4 +1,4 @@
-# poker-tracker — „Die Runde"
+# poker-tracker — „Ein Spitzhackenschlag"
 
 Poker-Rangliste der Freundesrunde (Cash Game, 9 Spieler, Standard-Buy-in 10 €).
 Eine einzelne HTML-Seite, veröffentlicht als Claude-Artefakt:

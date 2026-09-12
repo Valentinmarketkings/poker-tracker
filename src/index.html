@@ -1,5 +1,5 @@
 <meta charset="utf-8">
-<title>Die Runde</title>
+<title>Ein Spitzhackenschlag</title>
 <meta name="description" content="Poker-Rangliste der Freundesrunde">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500..900&family=Manrope:wght@400..800&display=swap">
@@ -271,7 +271,7 @@
 </style>
 
 <!-- Canonical data. The page rewrites exactly this block when it saves a new version. -->
-<script type="application/json" id="poker-data">{"version":1,"currency":"EUR","defaultBuyIn":10,"groupName":"Die Runde","players":[{"id":"valentin","name":"Valentin","color":"#C48800"},{"id":"phileas","name":"Phileas","color":"#3987E5"},{"id":"ayden","name":"Ayden","color":"#D95926"},{"id":"bardiya","name":"Bardiya","color":"#1F9AA8"},{"id":"benny","name":"Benny","color":"#E66767"},{"id":"kinan","name":"Kinan","color":"#9085E9"},{"id":"moritz","name":"Moritz","color":"#739A18"},{"id":"yannick","name":"Yannick","color":"#D55181"},{"id":"hooles","name":"Hooles","color":"#B8863F"}],"sessions":[]}</script>
+<script type="application/json" id="poker-data">{"version":1,"currency":"EUR","defaultBuyIn":10,"groupName":"Ein Spitzhackenschlag","players":[{"id":"valentin","name":"Valentin","color":"#C48800"},{"id":"phileas","name":"Phileas","color":"#3987E5"},{"id":"ayden","name":"Ayden","color":"#D95926"},{"id":"bardiya","name":"Bardiya","color":"#1F9AA8"},{"id":"benny","name":"Benny","color":"#E66767"},{"id":"kinan","name":"Kinan","color":"#9085E9"},{"id":"moritz","name":"Moritz","color":"#739A18"},{"id":"yannick","name":"Yannick","color":"#D55181"},{"id":"hooles","name":"Hooles","color":"#B8863F"}],"sessions":[]}</script>
 
 <div class="wrap">
   <header class="top">
@@ -279,8 +279,8 @@
       <div class="banner-in">
         <div class="brand">
           <div class="eyebrow">Privatrunde · Cash Game</div>
-          <h1><span class="s">♠</span> <span id="group-name">Die Runde</span></h1>
-          <div class="subtitle" id="subtitle">Wer hat am Ende das Geld?</div>
+          <h1><span class="s">♠</span> <span id="group-name">Ein Spitzhackenschlag</span></h1>
+          <div class="subtitle" id="subtitle">Keiner mag Hooles</div>
         </div>
         <div class="stack" aria-hidden="true">
           <span class="chip-av c4"></span><span class="chip-av c1"></span><span class="chip-av c2"></span><span class="chip-av c3"></span>
@@ -716,7 +716,7 @@
 
   function renderAll() {
     const S = computeStats(state);
-    $("#group-name").textContent = state.groupName || "Die Runde";
+    $("#group-name").textContent = state.groupName || "Ein Spitzhackenschlag";
     renderSummary(S);
     const hasData = S.sessions.length > 0;
     $("#empty").hidden = hasData;
