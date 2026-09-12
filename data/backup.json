@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "currency": "EUR",
+  "defaultBuyIn": 10,
+  "groupName": "Die Runde",
+  "players": [
+    {
+      "id": "valentin",
+      "name": "Valentin",
+      "color": "#C48800"
+    },
+    {
+      "id": "phileas",
+      "name": "Phileas",
+      "color": "#3987E5"
+    },
+    {
+      "id": "ayden",
+      "name": "Ayden",
+      "color": "#D95926"
+    },
+    {
+      "id": "bardiya",
+      "name": "Bardiya",
+      "color": "#1F9AA8"
+    },
+    {
+      "id": "benny",
+      "name": "Benny",
+      "color": "#E66767"
+    },
+    {
+      "id": "kinan",
+      "name": "Kinan",
+      "color": "#9085E9"
+    },
+    {
+      "id": "moritz",
+      "name": "Moritz",
+      "color": "#739A18"
+    },
+    {
+      "id": "yannick",
+      "name": "Yannick",
+      "color": "#D55181"
+    },
+    {
+      "id": "hooles",
+      "name": "Hooles",
+      "color": "#B8863F"
+    }
+  ],
+  "sessions": []
+}

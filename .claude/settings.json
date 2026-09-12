@@ -1,0 +1,24 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "V=\"$HOME/Desktop/claud/Valle sein Gehirn\"; [ -f \"$V/tools/brain_load.sh\" ] && VAULT_DIR=\"$V\" BRAIN_LOAD_MODE=slim bash \"$V/tools/brain_load.sh\" || true"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "V=\"$HOME/Desktop/claud/Valle sein Gehirn\"; [ -f \"$V/tools/brain_fertig_check.sh\" ] && bash \"$V/tools/brain_fertig_check.sh\" || true"
+          }
+        ]
+      }
+    ]
+  }
+}
