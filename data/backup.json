@@ -48,6 +48,11 @@
       "id": "hooles",
       "name": "Hooles",
       "color": "#B8863F"
+    },
+    {
+      "id": "lennard",
+      "name": "Lennard",
+      "color": "#B05CC4"
     }
   ],
   "sessions": []
