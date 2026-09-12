@@ -61,7 +61,7 @@
     background: radial-gradient(520px circle at var(--mx, 50%) var(--my, 15%), rgba(214, 178, 90, 0.10), transparent 62%);
     transition: background-position 0.2s;
   }
-  canvas.rain { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.75; }
+  canvas.rain { position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: 0.55; transition: opacity 0.6s; }
   canvas.rain.front { z-index: 60; opacity: 1; }
   .wrap { position: relative; z-index: 1; max-width: 780px; margin: 0 auto; padding: 18px 14px 130px; }
   @media (min-width: 640px) { .wrap { padding: 30px 24px 130px; } }
@@ -95,8 +95,9 @@
   .banner-in { position: relative; border-radius: 15px; overflow: hidden; padding: 22px 20px 20px; background: radial-gradient(ellipse 120% 100% at 20% 0%, var(--red-2), var(--red) 55%, #5c0c15 100%); box-shadow: inset 0 0 0 1px rgba(0,0,0,0.35), inset 0 0 0 7px rgba(214,178,90,0.35); }
   .banner-in::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(45deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 10px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 10px); }
   .banner .eyebrow { font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold-2); font-weight: 800; }
-  .banner h1 { font-size: clamp(30px, 8.5vw, 64px); line-height: 0.98; overflow-wrap: anywhere; font-weight: 800; color: var(--ink); font-variation-settings: "opsz" 96; margin-top: 8px; text-shadow: 0 2px 0 rgba(0,0,0,0.35); }
-  .banner h1 .s { color: var(--gold-2); font-weight: 500; }
+  .banner .eyebrow .s { font-size: 14px; letter-spacing: 0; }
+  .banner h1 { font-size: clamp(30px, 8.5vw, 58px); line-height: 1.02; font-weight: 800; color: var(--ink); font-variation-settings: "opsz" 96; margin-top: 8px; text-shadow: 0 2px 0 rgba(0,0,0,0.35); }
+    .banner h1 .t { padding: 0.06em 0.14em 0.2em 0.04em; margin-left: -0.04em; }
   .anim .banner h1 .t { background: linear-gradient(100deg, #f3ecdc 0%, #f3ecdc 38%, #ffffff 46%, #f0d48a 52%, #f3ecdc 60%, #f3ecdc 100%); background-size: 260% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; animation: shine 5.5s ease-in-out infinite; }
   @keyframes shine { 0% { background-position: 120% 0; } 60% { background-position: -40% 0; } 100% { background-position: -40% 0; } }
   .banner .subtitle { color: rgba(243,236,220,0.82); font-size: 14px; margin-top: 8px; font-weight: 700; letter-spacing: 0.04em; }
@@ -114,7 +115,7 @@
   .anim .stack .c2 { animation-delay: -1s; } .anim .stack .c3 { animation-delay: -2s; } .anim .stack .c4 { animation-delay: -3s; }
   @keyframes hover { 0%, 100% { translate: 0 0; } 50% { translate: 0 -5px; } }
   .stack:active .chip-av { transform: scale(0.94); }
-  @media (max-width: 520px) { .brand { padding-right: 0; } .stack { width: 100px; height: 92px; right: -24px; bottom: -30px; } .stack .chip-av { --sz: 48px; } .stack .c1 { left: 40px; top: 32px; } .stack .c2 { left: 12px; top: 14px; } .stack .c3 { left: 50px; top: 0; } .stack .c4 { left: 0; top: 44px; } .banner h1 { font-size: clamp(28px, 7.6vw, 64px); padding-right: 40px; } .banner .subtitle { padding-right: 70px; } .banner .eyebrow { padding-right: 120px; } }
+  @media (max-width: 520px) { .brand { padding-right: 0; } .stack { width: 100px; height: 92px; right: -24px; bottom: -30px; } .stack .chip-av { --sz: 48px; } .stack .c1 { left: 40px; top: 32px; } .stack .c2 { left: 12px; top: 14px; } .stack .c3 { left: 50px; top: 0; } .stack .c4 { left: 0; top: 44px; } .banner h1 { font-size: clamp(28px, 7.6vw, 58px); padding-right: 40px; } .banner .subtitle { padding-right: 70px; } .banner .eyebrow { padding-right: 96px; letter-spacing: 0.12em; font-size: 10px; } .rain-btn { font-size: 10px; padding: 4px 9px; letter-spacing: 0.08em; top: 10px; right: 10px; } }
 
   /* ---------- LED ticker ---------- */
   .ticker { position: relative; overflow: hidden; background: #050405; border-top: 1px solid var(--gold-deep); border-bottom: 1px solid var(--gold-deep); border-radius: 6px; height: 34px; display: flex; align-items: center; }
@@ -293,7 +294,7 @@
   .icard .back { transform: rotateY(180deg); background: repeating-linear-gradient(45deg, rgba(214,178,90,0.35) 0 2px, transparent 2px 9px), repeating-linear-gradient(-45deg, rgba(214,178,90,0.35) 0 2px, transparent 2px 9px), linear-gradient(#8f1521, #5c0c15); border: 4px solid #f3ecdc; outline: 1px solid var(--gold-deep); outline-offset: -8px; }
   @keyframes dealIn { 0% { transform: translateY(70vh) rotate(-30deg) rotateY(180deg); opacity: 0; } 12% { opacity: 1; } 100% { transform: translateY(0) rotate(var(--tilt)) rotateY(0deg); opacity: 1; } }
   .intro-title { font-family: var(--display); font-weight: 800; font-size: clamp(34px, 8vw, 68px); line-height: 1; margin: 28px 0 0; color: var(--ink); perspective: 600px; text-wrap: balance; }
-  .intro-title .L { display: inline-block; transform-origin: 50% 100%; animation: letter 0.6s var(--ease) both; animation-delay: calc(0.9s + var(--i) * 40ms); background: linear-gradient(100deg, #f3ecdc, #ffffff 30%, #f0d48a 55%, #d6b25a 75%, #f3ecdc); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .intro-title .L { display: inline-block; padding: 0 0.03em 0.14em; margin-bottom: -0.14em; transform-origin: 50% 100%; animation: letter 0.6s var(--ease) both; animation-delay: calc(0.9s + var(--i) * 40ms); background: linear-gradient(100deg, #f3ecdc, #ffffff 30%, #f0d48a 55%, #d6b25a 75%, #f3ecdc); -webkit-background-clip: text; background-clip: text; color: transparent; }
   @keyframes letter { from { transform: rotateX(-90deg) translateY(12px); opacity: 0; } to { transform: none; opacity: 1; } }
   .intro-sub { margin-top: 14px; color: var(--red-hot); font-weight: 800; letter-spacing: 0.28em; text-transform: uppercase; font-size: 13px; text-shadow: 0 0 10px rgba(255,77,87,0.55); animation: fadeUp 0.6s var(--ease) both; animation-delay: 1.95s; }
   .intro-skip { position: absolute; left: 0; right: 0; bottom: -80px; font-size: 11px; color: var(--ink-3); letter-spacing: 0.16em; text-transform: uppercase; animation: fadeUp 0.6s both; animation-delay: 1.2s; }
@@ -349,7 +350,7 @@
 </style>
 
 <!-- Canonical data. The page rewrites exactly this block when it saves a new version. -->
-<script type="application/json" id="poker-data">{"version":1,"currency":"EUR","defaultBuyIn":10,"groupName":"Ein Spitzhackenschlag","players":[{"id":"valentin","name":"Valentin","color":"#C48800"},{"id":"phileas","name":"Phileas","color":"#3987E5"},{"id":"ayden","name":"Ayden","color":"#D95926"},{"id":"bardiya","name":"Bardiya","color":"#1F9AA8"},{"id":"benny","name":"Benny","color":"#E66767"},{"id":"kinan","name":"Kinan","color":"#9085E9"},{"id":"moritz","name":"Moritz","color":"#739A18"},{"id":"yannick","name":"Yannick","color":"#D55181"},{"id":"hooles","name":"Hooles","color":"#B8863F"}],"sessions":[]}</script>
+<script type="application/json" id="poker-data">{"version":1,"currency":"EUR","defaultBuyIn":10,"groupName":"Ein Spitzhacken schlag","players":[{"id":"valentin","name":"Valentin","color":"#C48800"},{"id":"phileas","name":"Phileas","color":"#3987E5"},{"id":"ayden","name":"Ayden","color":"#D95926"},{"id":"bardiya","name":"Bardiya","color":"#1F9AA8"},{"id":"benny","name":"Benny","color":"#E66767"},{"id":"kinan","name":"Kinan","color":"#9085E9"},{"id":"moritz","name":"Moritz","color":"#739A18"},{"id":"yannick","name":"Yannick","color":"#D55181"},{"id":"hooles","name":"Hooles","color":"#B8863F"}],"sessions":[]}</script>
 
 <div id="intro" class="intro" hidden aria-hidden="true">
   <div class="intro-stage">
@@ -371,8 +372,8 @@
       <div class="banner-in">
         <button type="button" class="rain-btn" id="rain-btn" hidden>Make it rain</button>
         <div class="brand">
-          <div class="eyebrow">Privatrunde · Cash Game</div>
-          <h1><span class="s">♠</span> <span class="t" id="group-name">Ein Spitzhackenschlag</span></h1>
+          <div class="eyebrow"><span class="s">♠</span> Privatrunde · Cash Game</div>
+          <h1><span class="t" id="group-name">Ein Spitzhacken<br>schlag</span></h1>
           <div class="subtitle" id="subtitle">Keiner mag Hooles</div>
         </div>
         <div class="stack" id="stack" title="Make it rain" aria-hidden="true">
@@ -521,14 +522,15 @@
     const ctx = cv.getContext("2d");
     let W = 0, H = 0, parts = [], target = 0, raf = null, last = 0, paused = false;
     const CHIPS = [["#17151a", "#f3ecdc"], ["#b41c2b", "#f3ecdc"], ["#d6b25a", "#17151a"], ["#f3ecdc", "#b41c2b"]];
+    const NOTES = [["10", "#b41c2b", "#f6e9e6"], ["20", "#17151a", "#f3ecdc"], ["50", "#9a7a34", "#f7efd8"], ["10", "#b41c2b", "#f6e9e6"]];
     const pick = a => a[Math.floor(Math.random() * a.length)];
     function resize() { const dpr = Math.min(2, window.devicePixelRatio || 1); W = innerWidth; H = innerHeight; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); cv.style.width = W + "px"; cv.style.height = H + "px"; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); }
     function spawn(o = {}) {
       const u = Math.random();
-      const kind = u < 0.68 ? "chip" : u < 0.88 ? "note" : "coin";
+      const kind = u < 0.45 ? "chip" : u < 0.8 ? "note" : "coin";
       const p = { kind, x: Math.random() * W, y: -40 - Math.random() * H * 0.4, vy: 110 + Math.random() * 150, vx: (Math.random() - 0.5) * 30, rot: Math.random() * Math.PI * 2, vr: (Math.random() - 0.5) * 3, ph: Math.random() * Math.PI * 2, vph: 1.4 + Math.random() * 2, r: 9 + Math.random() * 9, g: 0, col: o.colors ? pick(o.colors) : pick(CHIPS) };
-      if (kind === "note") { p.w = 34 + Math.random() * 12; p.h = p.w * 0.52; p.vy *= 0.55; p.vr *= 0.5; }
-      if (kind === "coin") { p.r = 6 + Math.random() * 4; p.vy *= 1.2; }
+      if (kind === "note") { p.w = 44 + Math.random() * 18; p.h = p.w * 0.5; p.vy *= 0.55; p.vr *= 0.5; p.note = pick(NOTES); }
+      if (kind === "coin") { p.r = 8 + Math.random() * 6; p.vy *= 1.2; }
       if (o.fill) { p.y = Math.random() * H; }
       if (o.burst) { p.x = (o.x ?? W / 2) + (Math.random() - 0.5) * 60; p.y = o.y ?? H * 0.62; p.vy = -(280 + Math.random() * 380); p.vx = (Math.random() - 0.5) * 460; p.g = 900; }
       parts.push(p);
@@ -547,17 +549,23 @@
     }
     function drawNote(p) {
       const s = Math.max(0.1, Math.abs(Math.cos(p.ph)));
+      const [val, ink, paper] = p.note;
       ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.scale(1, s);
-      ctx.fillStyle = "#f3ecdc"; rr(-p.w / 2, -p.h / 2, p.w, p.h, 3); ctx.fill();
-      ctx.strokeStyle = "#b41c2b"; ctx.lineWidth = 1; rr(-p.w / 2 + 3, -p.h / 2 + 3, p.w - 6, p.h - 6, 2); ctx.stroke();
-      ctx.fillStyle = "#b41c2b"; ctx.font = `800 ${Math.round(p.h * 0.62)}px Manrope, sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("€", 0, 1);
+      ctx.fillStyle = paper; rr(-p.w / 2, -p.h / 2, p.w, p.h, 3); ctx.fill();
+      ctx.strokeStyle = "rgba(0,0,0,0.35)"; ctx.lineWidth = 1; rr(-p.w / 2, -p.h / 2, p.w, p.h, 3); ctx.stroke();
+      ctx.strokeStyle = ink; ctx.lineWidth = 1.2; rr(-p.w / 2 + 3, -p.h / 2 + 3, p.w - 6, p.h - 6, 2); ctx.stroke();
+      ctx.fillStyle = ink; ctx.globalAlpha *= 0.18; ctx.beginPath(); ctx.arc(-p.w * 0.22, 0, p.h * 0.32, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha /= 0.18;
+      ctx.fillStyle = ink; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.font = `800 ${Math.round(p.h * 0.5)}px Manrope, sans-serif`; ctx.fillText(val, p.w * 0.12, 1);
+      ctx.font = `800 ${Math.round(p.h * 0.28)}px Manrope, sans-serif`; ctx.fillText("€", p.w * 0.36, -p.h * 0.22); ctx.fillText("€", -p.w * 0.38, p.h * 0.24);
       ctx.restore();
     }
     function drawCoin(p) {
       const s = Math.max(0.16, Math.abs(Math.cos(p.ph)));
       ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.scale(1, s);
-      ctx.beginPath(); ctx.arc(0, 0, p.r, 0, Math.PI * 2); ctx.fillStyle = "#e0bd63"; ctx.fill(); ctx.strokeStyle = "#8a6a2a"; ctx.lineWidth = 1.5; ctx.stroke();
-      ctx.fillStyle = "#8a6a2a"; ctx.font = `800 ${Math.round(p.r * 1.3)}px Manrope, sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("€", 0, 1);
+      ctx.beginPath(); ctx.arc(0, 0, p.r, 0, Math.PI * 2); ctx.fillStyle = "#e0bd63"; ctx.fill(); ctx.strokeStyle = "#8a6a2a"; ctx.lineWidth = 2; ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, 0, p.r * 0.72, 0, Math.PI * 2); ctx.strokeStyle = "rgba(138,106,42,0.6)"; ctx.lineWidth = 1; ctx.stroke();
+      ctx.fillStyle = "#8a6a2a"; ctx.font = `800 ${Math.round(p.r * 1.25)}px Manrope, sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("€", 0, 1);
       ctx.restore();
     }
     function frame(t) {
@@ -589,7 +597,7 @@
   let stormTimer = null;
   function storm(n, ms, colors, x, y) {
     if (!animOn) return;
-    rain.front(true); rain.burst(n, colors, x, y); rain.setTarget(Math.max(ambient, 70));
+    rain.front(true); rain.burst(n, colors, x, y); rain.setTarget(Math.max(ambient, 130));
     clearTimeout(stormTimer); stormTimer = setTimeout(() => { rain.setTarget(ambient); setTimeout(() => rain.front(false), 2200); }, ms);
   }
 
@@ -943,7 +951,9 @@
   }
   function renderAll() {
     const S = computeStats(state);
-    $("#group-name").textContent = state.groupName || "Ein Spitzhackenschlag";
+    const words = (state.groupName || "Ein Spitzhacken schlag").trim().split(/\s+/);
+    const gn = $("#group-name"); gn.replaceChildren();
+    if (words.length > 1) gn.append(words.slice(0, -1).join(" "), el("br"), words[words.length - 1]); else gn.append(words[0]);
     renderSummary(S); renderTicker(S);
     const hasData = S.sessions.length > 0;
     $("#empty").hidden = hasData;
@@ -1116,7 +1126,7 @@
   }
   function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
   let modeBeforeDemo = null;
-  $("#demo-btn").addEventListener("click", () => { modeBeforeDemo = mode; mode = "demo"; state = demoState(); highlighted = null; firstPaint = true; renderAll(); setTimeout(() => { firstPaint = false; }, 2500); storm(80, 1800); window.scrollTo({ top: 0, behavior: animOn ? "smooth" : "auto" }); });
+  $("#demo-btn").addEventListener("click", () => { modeBeforeDemo = mode; mode = "demo"; state = demoState(); highlighted = null; firstPaint = true; renderAll(); setTimeout(() => { firstPaint = false; }, 2500); storm(170, 2200); window.scrollTo({ top: 0, behavior: animOn ? "smooth" : "auto" }); });
   $("#demo-off").addEventListener("click", () => { mode = modeBeforeDemo || "reader"; state = loadState(); highlighted = null; renderAll(); });
 
   /* ---------- toast + celebration ---------- */
@@ -1130,9 +1140,9 @@
     toast(p ? `Abend gespeichert. Sieger: ${p.name} mit ${fmt(c.net)}` : "Abend gespeichert.");
     if (!animOn) return;
     const colors = p ? [[p.color, "#f3ecdc"], ["#d6b25a", "#17151a"], [p.color, "#f3ecdc"], ["#f3ecdc", "#b41c2b"]] : undefined;
-    storm(220, 3200, colors);
-    setTimeout(() => rain.burst(120, colors, innerWidth * 0.25, innerHeight * 0.7), 500);
-    setTimeout(() => rain.burst(120, colors, innerWidth * 0.75, innerHeight * 0.7), 1000);
+    storm(320, 3600, colors);
+    setTimeout(() => rain.burst(180, colors, innerWidth * 0.25, innerHeight * 0.7), 500);
+    setTimeout(() => rain.burst(180, colors, innerWidth * 0.75, innerHeight * 0.7), 1000);
   }
 
   /* ---------- intro ---------- */
@@ -1140,7 +1150,7 @@
   function playIntro() {
     const box = $("#intro");
     const title = $("#intro-title"); title.replaceChildren();
-    const name = state.groupName || "Ein Spitzhackenschlag";
+    const name = state.groupName || "Ein Spitzhacken schlag";
     let i = 0;
     for (const word of name.split(" ")) {
       const w = el("span", { style: "display:inline-block; white-space:nowrap" });
@@ -1149,7 +1159,7 @@
     }
     $("#intro-sub").textContent = $("#subtitle").textContent;
     box.hidden = false;
-    rain.front(true); rain.fill(70); rain.setTarget(110);
+    rain.front(true); rain.fill(150); rain.setTarget(160);
     const total = 1.1 + i * 0.04 + 1.3;
     introTimer = setTimeout(() => finishIntro(false), total * 1000);
     box.addEventListener("click", () => finishIntro(false), { once: true });
@@ -1163,14 +1173,14 @@
     } else if (box) box.remove();
     try { sessionStorage.setItem("poker:intro", "1"); } catch (e) { /* ignore */ }
     rain.front(false);
-    rainAmbient(animOn ? 14 : 0);
+    rainAmbient(animOn ? 36 : 0);
     document.documentElement.classList.add("ready");
     setTimeout(() => { firstPaint = false; }, 2600);
   }
 
   /* ---------- extras ---------- */
-  $("#rain-btn").addEventListener("click", e => { const r = e.currentTarget.getBoundingClientRect(); storm(140, 2600, undefined, r.left + r.width / 2, r.top + r.height / 2); });
-  $("#stack").addEventListener("click", e => { const r = e.currentTarget.getBoundingClientRect(); storm(120, 2200, undefined, r.left + r.width / 2, r.top + r.height / 2); });
+  $("#rain-btn").addEventListener("click", e => { const r = e.currentTarget.getBoundingClientRect(); storm(240, 3000, undefined, r.left + r.width / 2, r.top + r.height / 2); });
+  $("#stack").addEventListener("click", e => { const r = e.currentTarget.getBoundingClientRect(); storm(200, 2600, undefined, r.left + r.width / 2, r.top + r.height / 2); });
   $("#anim-btn").addEventListener("click", () => { try { localStorage.setItem("poker:anim", animOn ? "off" : "on"); } catch (e) { /* ignore */ } location.reload(); });
   if (animOn && window.matchMedia("(pointer: fine)").matches) {
     let mt = null;

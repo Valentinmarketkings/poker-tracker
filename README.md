@@ -34,6 +34,12 @@ Valentin trägt nach jedem Abend ein, die Freunde öffnen den Link am Handy.
 Gewinn pro Spieler und Abend = `cashOut − buyIn`. Das Formular prüft, dass Cash-outs und Buy-ins
 sich decken (Nullsumme) und lässt Abweichungen nur mit ausdrücklichem Haken zu.
 
+## Titel
+
+Der Gruppenname steht im Datenblock als „Ein Spitzhacken schlag“ (mit Leerzeichen, Valentins Wunsch): die
+Seite setzt das letzte Wort immer auf eine eigene Zeile, damit der Titel auf Handy und Desktop gleich bricht.
+Der Browser-Tab heißt weiter „Ein Spitzhackenschlag“.
+
 ## Bedienung
 
 - **Abend eintragen:** goldener Button unten rechts → Datum, Spieler antippen, Buy-in (Rebuy per
@@ -47,8 +53,9 @@ sich decken (Nullsumme) und lässt Abweichungen nur mit ausdrücklichem Haken zu
 
 - **Intro** beim Öffnen (einmal pro Browser-Tab, Tipp überspringt): Spotlight, drei Karten fliegen ein und
   drehen sich um, der Titel klappt Buchstabe für Buchstabe auf, dazu Chip- und Geldregen im Canvas.
-- **Nieselregen** aus Chips läuft danach hinter den Inhaltsflächen weiter; **Stürme** (Speichern eines
-  Abends, „Make it rain“, Tipp auf den Chip-Stapel) fallen für ein paar Sekunden vor dem Inhalt.
+- **Dauerregen** aus Chips, Geldscheinen (10/20/50 €) und Münzen fällt halb durchsichtig vor dem Inhalt;
+  **Stürme** (Speichern eines Abends, „Make it rain“, Tipp auf den Chip-Stapel) sind für ein paar Sekunden
+  dicht und voll deckend. Mengen: Intro ~160 Teile, Dauerregen 36, Sturm 130+.
 - Podiumskarten drehen sich vom Rücken auf die Vorderseite, Zahlen zählen hoch, Chart-Linien zeichnen
   sich, Medaillen drehen ein, LED-Laufband mit Fakten aus den Daten, Gold-Schimmer auf Rand und Titel.
 - **Aus-Schalter** im Footer („Animationen aus“, pro Gerät in `localStorage`), außerdem automatisch aus bei
