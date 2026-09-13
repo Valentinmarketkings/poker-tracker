@@ -349,7 +349,7 @@
   .anim .toast { animation: pop 0.35s var(--ease); }
 </style>
 
-<!-- Canonical data. The page rewrites exactly this block when it saves a new version. -->
+<!-- Offline fallback only. The live data is docs/data/results.json (fetched at load, written by the entry form via GitHub API). -->
 <script type="application/json" id="poker-data">{"version":1,"currency":"EUR","defaultBuyIn":10,"groupName":"Ein Spitzhacken schlag","players":[{"id":"valentin","name":"Valentin","color":"#C48800"},{"id":"phileas","name":"Phileas","color":"#3987E5"},{"id":"ayden","name":"Ayden","color":"#D95926"},{"id":"bardiya","name":"Bardiya","color":"#1F9AA8"},{"id":"benny","name":"Benny","color":"#E66767"},{"id":"kinan","name":"Kinan","color":"#9085E9"},{"id":"moritz","name":"Moritz","color":"#739A18"},{"id":"yannick","name":"Yannick","color":"#D55181"},{"id":"hooles","name":"Hooles","color":"#B8863F"},{"id":"lennard","name":"Lennard","color":"#B05CC4"}],"sessions":[{"id":"2026-09-12-erste","date":"2026-09-12","title":"","entries":[{"player":"valentin","buyIn":10,"cashOut":20},{"player":"phileas","buyIn":10,"cashOut":0},{"player":"bardiya","buyIn":10,"cashOut":30},{"player":"yannick","buyIn":10,"cashOut":0},{"player":"lennard","buyIn":10,"cashOut":0}]}]}</script>
 
 <div id="intro" class="intro" hidden aria-hidden="true">
@@ -421,6 +421,7 @@
   <footer>
     <div id="mode-note" class="mode-note"></div>
     <div class="links">
+      <button type="button" id="setup-btn">Eintragen einrichten</button>
       <button type="button" id="anim-btn">Animationen aus</button>
       <button type="button" id="export-btn">Daten exportieren</button>
       <button type="button" id="import-btn" hidden>Daten importieren</button>
@@ -458,6 +459,24 @@
         <button type="submit" class="btn primary" id="save">Speichern</button>
       </div>
     </div>
+  </form>
+</dialog>
+
+<dialog id="token-dlg">
+  <form class="modal" id="token-form" method="dialog">
+    <div class="mh"><h2>Eintragen einrichten</h2><button type="button" class="btn-ghost" id="token-close">Schließen</button></div>
+    <div class="mb">
+      <p style="margin:0;font-size:14px;color:var(--ink-2)">Damit du Abende direkt hier eintragen kannst, speichert die Seite in das GitHub-Repository <b id="token-repo"></b>. Dafür braucht sie einen Token mit Schreibrecht. Er bleibt nur in diesem Browser.</p>
+      <ol style="margin:0;padding-left:18px;font-size:13px;color:var(--ink-2);line-height:1.6">
+        <li>github.com → Settings → Developer settings → Personal access tokens → <b>Fine-grained tokens</b> → Generate new token</li>
+        <li>Repository access: <b>Only select repositories</b> → poker-tracker</li>
+        <li>Permissions → Repository permissions → <b>Contents: Read and write</b></li>
+        <li>Token kopieren und hier einfügen</li>
+      </ol>
+      <div class="field"><label for="token-input">GitHub-Token</label><input type="password" id="token-input" autocomplete="off" placeholder="github_pat_…"></div>
+      <div class="warn" id="token-warn" hidden></div>
+    </div>
+    <div class="mf"><div class="actions"><button type="button" class="btn secondary" id="token-remove" hidden>Token entfernen</button><button type="submit" class="btn primary" id="token-save">Prüfen und speichern</button></div></div>
   </form>
 </dialog>
 
@@ -512,7 +531,10 @@
   const baseState = JSON.parse(dataEl.textContent);
   let state = baseState;
   let mode = "loading";
-  let artifactNs = null;
+  const GH = { owner: "Valentinmarketkings", repo: "poker-tracker", branch: "main", path: "docs/data/results.json" };
+  const TOKEN_KEY = "poker:gh-token", CACHE_KEY = "poker:cache";
+  let token = null;
+  try { token = localStorage.getItem(TOKEN_KEY); } catch (e) { /* ignore */ }
   let highlighted = null;
   let openDetails = new Set();
 
@@ -949,7 +971,9 @@
     $("#import-btn").hidden = !(mode === "writer" || mode === "local");
     $("#rain-btn").hidden = !animOn;
     $("#anim-btn").textContent = animOn ? "Animationen aus" : "Animationen an";
-    $("#mode-note").textContent = mode === "reader" ? "Nur Ansicht. Eintragen kann nur der Besitzer der Seite." : mode === "local" ? "Lokaler Modus: Daten liegen nur in diesem Browser." : mode === "demo" ? "Beispieldaten. Nichts davon wird gespeichert." : "";
+    $("#setup-btn").textContent = mode === "writer" ? "Eintragen: aktiv" : "Eintragen einrichten";
+    $("#setup-btn").hidden = mode === "local" || mode === "demo";
+    $("#mode-note").textContent = mode === "reader" ? "Nur Ansicht." : mode === "local" ? "Lokaler Modus: Daten liegen nur in diesem Browser." : mode === "demo" ? "Beispieldaten. Nichts davon wird gespeichert." : mode === "writer" ? "Änderungen sind für alle nach etwa einer Minute sichtbar." : "";
   }
   function renderAll() {
     const S = computeStats(state);
@@ -964,30 +988,75 @@
     applyMode();
   }
 
-  /* ---------- persistence ---------- */
-  const MARK = /(<script type="application\/json" id="poker-data">)([\s\S]*?)(<\/script>)/;
-  async function persist(next, celebrate) {
+  /* ---------- persistence: results.json in the GitHub repo ---------- */
+  const API = `https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/${GH.path}`;
+  const ghHeaders = t => ({ Authorization: `Bearer ${t}`, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" });
+  const b64 = str => btoa(unescape(encodeURIComponent(str)));
+  function cacheState(st) { try { localStorage.setItem(CACHE_KEY, JSON.stringify(st)); } catch (e) { /* ignore */ } }
+  async function loadRemote() {
+    let remote = null;
+    try {
+      const ctrl = new AbortController(); const tm = setTimeout(() => ctrl.abort(), 4000);
+      const r = await fetch(`data/results.json?t=${Date.now()}`, { cache: "no-store", signal: ctrl.signal });
+      clearTimeout(tm);
+      if (r.ok) remote = await r.json();
+    } catch (e) { /* offline or file:// */ }
+    let cached = null;
+    try { cached = JSON.parse(localStorage.getItem(CACHE_KEY) || "null"); } catch (e) { /* ignore */ }
+    if (remote && cached && cached.updatedAt && (!remote.updatedAt || cached.updatedAt > remote.updatedAt)) return cached; // deploy still running
+    return remote || null;
+  }
+  async function verifyToken(t) {
+    const r = await fetch(`${API}?ref=${GH.branch}`, { headers: ghHeaders(t), cache: "no-store" });
+    if (r.status === 401 || r.status === 403) throw { code: "auth" };
+    if (r.status === 404) throw { code: "notfound" };
+    if (!r.ok) throw { code: "http", status: r.status };
+    return (await r.json()).sha;
+  }
+  async function persist(next, celebrate, message) {
     if (mode === "demo") { state = next; renderAll(); if (celebrate) celebrateNow(celebrate); return; }
     if (mode === "local") { try { localStorage.setItem(LS_KEY, JSON.stringify(next)); } catch (e) { /* ignore */ } state = next; renderAll(); if (celebrate) celebrateNow(celebrate); return; }
-    if (mode !== "writer" || !artifactNs) throw { code: "not_writer" };
-    const res = await fetch(location.pathname + location.search, { cache: "no-store" });
-    const src = await res.text();
-    if (!MARK.test(src)) throw { code: "no_marker" };
-    if (!/^\s*<!doctype html>/i.test(src)) throw { code: "no_doctype" };
-    const json = JSON.stringify(next).replace(/<\//g, "<\\/");
-    const html = src.replace(MARK, (m, a, b, c) => a + json + c);
-    try { if (celebrate) sessionStorage.setItem("poker:celebrate", JSON.stringify(celebrate)); } catch (e) { /* ignore */ }
-    await artifactNs.publish(html);
+    if (mode !== "writer" || !token) throw { code: "not_writer" };
+    next = { ...next, updatedAt: new Date().toISOString().replace(/\.\d{3}Z$/, "Z") };
+    const body = JSON.stringify(next, null, 2) + "\n";
+    let lastErr = null;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      let sha = null;
+      try { sha = await verifyToken(token); } catch (e) { if (e.code !== "notfound") throw e; }
+      const r = await fetch(API, { method: "PUT", headers: { ...ghHeaders(token), "Content-Type": "application/json" }, body: JSON.stringify({ message: message || "Ergebnisse aktualisiert", content: b64(body), sha: sha || undefined, branch: GH.branch }) });
+      if (r.ok) { state = next; cacheState(next); renderAll(); if (celebrate) celebrateNow(celebrate); else toast("Gespeichert. Für alle sichtbar in etwa einer Minute."); return; }
+      if (r.status === 401 || r.status === 403) throw { code: "auth" };
+      if (r.status === 409 || r.status === 422) { lastErr = { code: "conflict" }; continue; }
+      throw { code: "http", status: r.status };
+    }
+    throw lastErr || { code: "http" };
   }
   function handleSaveError(err) {
     const code = err && err.code;
-    if (code === "conflict") return;
-    if (code === "not_writer" || code === "not_granted" || code === "not_declared") { mode = "reader"; renderAll(); toast("Nur Ansicht: diese Seite kann nur ihr Besitzer ändern."); return; }
-    if (code === "no_marker" || code === "no_doctype") { toast("Speichern nicht möglich: Quelltext konnte nicht gelesen werden. Daten liegen im Export."); openIO(true); return; }
-    if (code === "rate_limited") { toast("Zu viele Speichervorgänge kurz hintereinander. Kurz warten und nochmal."); return; }
+    if (code === "not_writer") { toast("Zum Eintragen zuerst im Footer „Eintragen einrichten“ öffnen."); return; }
+    if (code === "auth") { toast("Der GitHub-Token ist ungültig oder hat kein Schreibrecht. Im Footer neu einrichten."); return; }
+    if (code === "conflict") { toast("Jemand hat gerade gleichzeitig gespeichert. Seite neu laden und nochmal."); return; }
+    if (code === "notfound") { toast("Die Datei data/results.json fehlt im Repository."); return; }
+    if (err instanceof TypeError) { toast("Keine Verbindung zu GitHub. Später nochmal."); return; }
     toast("Speichern hat nicht geklappt. Nochmal versuchen.");
     console.error(err);
   }
+
+  /* ---------- token setup ---------- */
+  const tokenDlg = $("#token-dlg");
+  $("#token-repo").textContent = `${GH.owner}/${GH.repo}`;
+  $("#setup-btn").addEventListener("click", () => { $("#token-input").value = ""; $("#token-warn").hidden = true; $("#token-remove").hidden = !token; tokenDlg.showModal(); });
+  $("#token-close").addEventListener("click", () => tokenDlg.close());
+  $("#token-remove").addEventListener("click", () => { token = null; try { localStorage.removeItem(TOKEN_KEY); } catch (e) { /* ignore */ } mode = "reader"; tokenDlg.close(); renderAll(); toast("Token entfernt. Nur noch Ansicht."); });
+  $("#token-form").addEventListener("submit", async ev => {
+    ev.preventDefault();
+    const t = $("#token-input").value.trim(); const warn = $("#token-warn");
+    if (!t) { warn.hidden = false; warn.textContent = "Token einfügen."; return; }
+    $("#token-save").disabled = true; $("#token-save").textContent = "Prüfe…";
+    try { await verifyToken(t); token = t; try { localStorage.setItem(TOKEN_KEY, t); } catch (e) { /* ignore */ } mode = "writer"; tokenDlg.close(); renderAll(); toast("Eintragen ist eingerichtet."); }
+    catch (e) { warn.hidden = false; warn.textContent = e.code === "auth" ? "GitHub lehnt den Token ab. Repository-Zugriff und Contents: Read and write prüfen." : e.code === "notfound" ? "Token geht, aber data/results.json wurde im Repository nicht gefunden." : e instanceof TypeError ? "Keine Verbindung zu GitHub." : "Prüfung fehlgeschlagen."; }
+    finally { $("#token-save").disabled = false; $("#token-save").textContent = "Prüfen und speichern"; }
+  });
 
   /* ---------- form ---------- */
   const dlg = $("#dlg");
@@ -1071,14 +1140,15 @@
     const best = entries.reduce((a, b) => (b.cashOut - b.buyIn) > (a.cashOut - a.buyIn) ? b : a);
     const celebrate = editing ? null : { winner: best.player, net: round2(best.cashOut - best.buyIn), date };
     $("#save").disabled = true; $("#save").textContent = "Speichern…";
-    try { await persist(next, celebrate); dlg.close(); if (mode !== "writer" && !celebrate) toast("Abend aktualisiert."); }
+    const wp = playerById(best.player);
+    try { await persist(next, celebrate, editing ? `Abend ${date} bearbeitet` : `Abend ${date}: ${wp ? wp.name : "?"} gewinnt`); dlg.close(); if (mode !== "writer" && !celebrate) toast("Abend aktualisiert."); }
     catch (err) { handleSaveError(err); }
     finally { $("#save").disabled = false; $("#save").textContent = "Speichern"; }
   });
   async function deleteSession(id) {
     const s = state.sessions.find(x => x.id === id); if (!s) return;
     if (!confirm(`Abend vom ${fmtDate(s.date)} wirklich löschen?`)) return;
-    try { await persist({ ...state, sessions: state.sessions.filter(x => x.id !== id) }, null); if (mode !== "writer") toast("Abend gelöscht."); }
+    try { await persist({ ...state, sessions: state.sessions.filter(x => x.id !== id) }, null, `Abend ${s.date} gelöscht`); if (mode !== "writer") toast("Abend gelöscht."); }
     catch (err) { handleSaveError(err); }
   }
   $("#fab").addEventListener("click", () => openForm(null));
@@ -1105,7 +1175,7 @@
     try { next = JSON.parse($("#io-area").value); if (!Array.isArray(next.sessions) || !Array.isArray(next.players)) throw 0; }
     catch (e) { toast("Das ist kein gültiger Export."); return; }
     if (!confirm(`${next.sessions.length} Abende übernehmen und die aktuellen Daten ersetzen?`)) return;
-    try { await persist(next, null); io.close(); if (mode !== "writer") toast("Daten übernommen."); } catch (err) { handleSaveError(err); }
+    try { await persist(next, null, "Daten importiert"); io.close(); if (mode !== "writer") toast("Daten übernommen."); } catch (err) { handleSaveError(err); }
   });
 
   /* ---------- demo ---------- */
@@ -1195,21 +1265,19 @@
     if (mode === "local") { try { const raw = localStorage.getItem(LS_KEY); if (raw) return JSON.parse(raw); } catch (e) { /* ignore */ } }
     return baseState;
   }
-  const inShell = typeof window.claude === "object" && window.claude && typeof window.claude.use === "function";
-  if (!inShell) { mode = "local"; state = loadState(); }
-  else { mode = "reader"; }
+  const isFile = location.protocol === "file:";
+  if (isFile) { mode = "local"; state = loadState(); }
+  else { mode = token ? "writer" : "reader"; }
   rain.mount();
-  renderAll();
   let celebrate = null, introSeen = false;
   try { celebrate = sessionStorage.getItem("poker:celebrate"); if (celebrate) sessionStorage.removeItem("poker:celebrate"); introSeen = !!sessionStorage.getItem("poker:intro"); } catch (e) { /* ignore */ }
-  if (animOn && !introSeen && !celebrate) playIntro(); else finishIntro(true);
-  if (celebrate) setTimeout(() => { try { celebrateNow(JSON.parse(celebrate)); } catch (e) { /* ignore */ } }, 500);
-  if (inShell) {
-    window.claude.use("artifact").then(ns => {
-      artifactNs = ns;
-      if (ns) { mode = "writer"; applyMode(); if (!$("#content").hidden) renderLog(computeStats(state)); }
-    }).catch(() => {});
-  }
+  if (animOn && !introSeen && !celebrate) playIntro();
+  (async () => {
+    if (!isFile) { const remote = await loadRemote(); if (remote) state = remote; }
+    renderAll();
+    if (!(animOn && !introSeen && !celebrate)) finishIntro(true);
+    if (celebrate) setTimeout(() => { try { celebrateNow(JSON.parse(celebrate)); } catch (e) { /* ignore */ } }, 500);
+  })();
   let rt = null;
   window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { if (!$("#content").hidden) renderChart(computeStats(state)); }, 150); });
 })();

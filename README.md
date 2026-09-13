@@ -1,53 +1,50 @@
-# poker-tracker — „Ein Spitzhackenschlag"
+# poker-tracker — „Ein Spitzhackenschlag“
 
-Poker-Rangliste der Freundesrunde (Cash Game, 9 Spieler, Standard-Buy-in 10 €).
-Eine einzelne HTML-Seite, veröffentlicht als Claude-Artefakt:
-https://claude.ai/code/artifact/d1162e97-072f-42a1-b4fb-e665bec6b0b1
+Poker-Rangliste der Freundesrunde (Cash Game, 10 Spieler, Standard-Buy-in 10 €).
+Eine statische Webseite auf GitHub Pages, ohne Anmeldung für alle mit dem Link erreichbar:
 
-Valentin trägt nach jedem Abend ein, die Freunde öffnen den Link am Handy.
+https://valentinmarketkings.github.io/poker-tracker/
 
 ## Wie es funktioniert
 
-- **Eine Datei:** `src/index.html`. Design, Logik und Daten stecken in derselben Seite.
-- **Daten liegen in der Seite selbst**, im Block `<script type="application/json" id="poker-data">`.
-  Rendern heißt: JSON lesen, DOM bauen. Leser brauchen keinen Datenbankzugriff.
-- **Speichern** (nur der Besitzer des Artefakts): Die Seite holt ihren eigenen Quelltext per
-  `fetch`, tauscht den Datenblock aus und veröffentlicht die Seite per `claude.use("artifact")`
-  als neue Version. Jede Speicherung ist eine Artefakt-Version, die Historie ist also eingebaut.
-- **Modi**, die die Seite selbst erkennt:
-  - *writer*: im Artefakt, Besitzer → Eingabe-Button sichtbar.
-  - *reader*: im Artefakt, kein Schreibrecht → nur Ansicht, Hinweis im Footer.
-  - *local*: die Datei ohne Artefakt-Shell geöffnet → speichert in `localStorage` (zum Testen).
-  - *demo*: Beispieldaten, nichts wird gespeichert.
+- **Seite:** `docs/index.html`, eine Datei mit Design, Logik und Animationen.
+- **Daten:** `docs/data/results.json` (Spieler, Abende, `updatedAt`). Die Seite lädt die Datei beim Öffnen.
+  Der JSON-Block in der HTML-Datei ist nur ein Offline-Fallback (Spieler ohne Abende).
+- **Hosting:** GitHub Pages, deployt per Workflow `.github/workflows/pages.yml` bei jedem Push auf `main`
+  (Inhalt von `docs/`). Ein Deploy dauert etwa eine Minute.
+
+## Eintragen — zwei Wege
+
+1. **Direkt in der Seite (Valentin):** Footer → „Eintragen einrichten“ → einmalig einen GitHub
+   Fine-grained-Token mit *Contents: Read and write* nur für dieses Repository hinterlegen. Der Token
+   bleibt im Browser (`localStorage`), nie im Repo. Danach erscheint der goldene Knopf; Speichern schreibt
+   `results.json` per GitHub-API als Commit, der Workflow deployt, nach etwa einer Minute sehen es alle.
+   Bis dahin zeigt der eigene Browser den frischen Stand aus einem lokalen Zwischenspeicher.
+2. **Über Claude:** Ergebnisse nennen, Claude ändert `docs/data/results.json`, committet und pusht.
+
+Leser ohne Token sehen nur die Ansicht. Ein Token, der in falsche Hände gerät, kann nur dieses eine
+Repository ändern; im Zweifel bei GitHub widerrufen.
 
 ## Datenmodell
 
 ```json
 {
-  "version": 1, "currency": "EUR", "defaultBuyIn": 10, "groupName": "Die Runde",
+  "version": 1, "currency": "EUR", "defaultBuyIn": 10, "groupName": "Ein Spitzhacken schlag",
   "players": [{"id": "valentin", "name": "Valentin", "color": "#C48800"}],
-  "sessions": [{"id": "2026-09-19-ab12c", "date": "2026-09-19", "title": "bei Benny",
-                "entries": [{"player": "valentin", "buyIn": 10, "cashOut": 23.5}]}]
+  "sessions": [{"id": "2026-09-12-erste", "date": "2026-09-12", "title": "",
+                "entries": [{"player": "valentin", "buyIn": 10, "cashOut": 20}]}],
+  "updatedAt": "2026-09-13T00:00:00Z"
 }
 ```
 
-Gewinn pro Spieler und Abend = `cashOut − buyIn`. Das Formular prüft, dass Cash-outs und Buy-ins
-sich decken (Nullsumme) und lässt Abweichungen nur mit ausdrücklichem Haken zu.
+Gewinn pro Spieler und Abend = `cashOut − buyIn`. Das Formular prüft die Nullsumme und lässt Abweichungen
+nur mit ausdrücklichem Haken zu. Titel (Fisch, Sponsor, Bankomat, Stammgast) werden nur bei eindeutigem
+Stand vergeben.
 
 ## Titel
 
-Der Gruppenname steht im Datenblock als „Ein Spitzhacken schlag“ (mit Leerzeichen, Valentins Wunsch): die
-Seite setzt das letzte Wort immer auf eine eigene Zeile, damit der Titel auf Handy und Desktop gleich bricht.
-Der Browser-Tab heißt weiter „Ein Spitzhackenschlag“.
-
-## Bedienung
-
-- **Abend eintragen:** goldener Button unten rechts → Datum, Spieler antippen, Buy-in (Rebuy per
-  „+10"), Cash-out → Speichern. Die Seite lädt neu, Konfetti für den Sieger.
-- **Bearbeiten / Löschen:** unter jedem Abend im Abschnitt „Abende".
-- **Verlauf:** Standard zeigt die Top 3 farbig, alle anderen gedimmt. Namen in der Legende antippen,
-  um Linien ein- oder auszublenden. Finger/Maus über dem Chart zeigt alle Bilanzen an dem Abend.
-- **Export / Import:** im Footer. Export ist das JSON aus dem Datenblock, Import ersetzt alles.
+Der Gruppenname steht in den Daten als „Ein Spitzhacken schlag“ (mit Leerzeichen, Valentins Wunsch): die
+Seite setzt das letzte Wort immer auf eine eigene Zeile. Der Browser-Tab heißt „Ein Spitzhackenschlag“.
 
 ## Animationen
 
@@ -55,27 +52,19 @@ Der Browser-Tab heißt weiter „Ein Spitzhackenschlag“.
   drehen sich um, der Titel klappt Buchstabe für Buchstabe auf, dazu Chip- und Geldregen im Canvas.
 - **Dauerregen** aus Chips, Geldscheinen (10/20/50 €) und Münzen fällt halb durchsichtig vor dem Inhalt;
   **Stürme** (Speichern eines Abends, „Make it rain“, Tipp auf den Chip-Stapel) sind für ein paar Sekunden
-  dicht und voll deckend. Mengen: Intro ~160 Teile, Dauerregen 36, Sturm 130+.
+  dicht und voll deckend.
 - Podiumskarten drehen sich vom Rücken auf die Vorderseite, Zahlen zählen hoch, Chart-Linien zeichnen
   sich, Medaillen drehen ein, LED-Laufband mit Fakten aus den Daten, Gold-Schimmer auf Rand und Titel.
-- **Aus-Schalter** im Footer („Animationen aus“, pro Gerät in `localStorage`), außerdem automatisch aus bei
+- **Aus-Schalter** im Footer („Animationen aus“, pro Gerät), außerdem automatisch aus bei
   `prefers-reduced-motion`. Der Regen pausiert, wenn der Tab im Hintergrund ist.
-
-## Backup
-
-`data/backup.json` ist ein manueller Snapshot. Aktualisieren: Artefakt per `Artifact read` holen,
-den Inhalt des Blocks `#poker-data` extrahieren und hier ablegen. Alternativ „Daten exportieren"
-in der Seite und den Text hier einfügen.
-
-## Fallback, falls der Artefakt-Link für Freunde nicht funktioniert
-
-Dieselbe Seite läuft ohne Änderung als statische Seite (z. B. GitHub Pages mit `src/` als Root).
-Dann gibt es keinen Schreibpfad im Browser; Eintragen läuft über eine Claude-Session, die den
-Datenblock in `src/index.html` ändert und pusht, oder über „Daten importieren" im lokalen Modus
-plus Commit.
 
 ## Spielerfarben
 
-Die neun Farben sind gegen den Filz-Hintergrund `#0F3D2E` mit dem dataviz-Validator geprüft
-(Helligkeitsband, Chroma, Farbfehlsichtigkeit benachbarter Paare, Kontrast ≥ 3:1). Reihenfolge
-ist Teil der Prüfung, nicht kosmetisch.
+Die zehn Farben sind mit dem dataviz-Validator geprüft (Helligkeitsband, Chroma, Farbfehlsichtigkeit
+benachbarter Paare, Kontrast ≥ 3:1). Die Reihenfolge ist Teil der Prüfung; neue Spieler werden hinten
+angehängt und gegen den Vorgänger geprüft.
+
+## Historie
+
+Bis 2026-09-13 lief das Sheet als Claude-Artefakt (selbst-speichernde Seite). Verworfen, weil Leser dort
+einen Claude-Account brauchen.
