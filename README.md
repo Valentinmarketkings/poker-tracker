@@ -50,9 +50,9 @@ Seite setzt das letzte Wort immer auf eine eigene Zeile. Der Browser-Tab heißt 
 
 - **Intro** beim Öffnen (einmal pro Browser-Tab, Tipp überspringt): Spotlight, drei Karten fliegen ein und
   drehen sich um, der Titel klappt Buchstabe für Buchstabe auf, dazu Chip- und Geldregen im Canvas.
-- **Dauerregen** aus Chips, Geldscheinen (10/20/50 €) und Münzen fällt halb durchsichtig vor dem Inhalt;
-  **Stürme** (Speichern eines Abends, „Make it rain“, Tipp auf den Chip-Stapel) sind für ein paar Sekunden
-  dicht und voll deckend.
+- **Dauerregen** aus Chips, Geldscheinen (10/20/50 €) und Münzen fällt **hinter** den Inhaltsflächen
+  (Valentins Wunsch, Lesbarkeit); **Stürme** (Speichern eines Abends, „Make it rain“, Tipp auf den
+  Chip-Stapel) sind dichter, bleiben aber ebenfalls hinten. Nur im Intro fällt der Regen vorne.
 - Podiumskarten drehen sich vom Rücken auf die Vorderseite, Zahlen zählen hoch, Chart-Linien zeichnen
   sich, Medaillen drehen ein, LED-Laufband mit Fakten aus den Daten, Gold-Schimmer auf Rand und Titel.
 - **Aus-Schalter** im Footer („Animationen aus“, pro Gerät), außerdem automatisch aus bei

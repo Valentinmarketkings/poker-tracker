@@ -61,7 +61,7 @@
     background: radial-gradient(520px circle at var(--mx, 50%) var(--my, 15%), rgba(214, 178, 90, 0.10), transparent 62%);
     transition: background-position 0.2s;
   }
-  canvas.rain { position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: 0.55; transition: opacity 0.6s; }
+  canvas.rain { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.85; transition: opacity 0.6s; }
   canvas.rain.front { z-index: 60; opacity: 1; }
   .wrap { position: relative; z-index: 1; max-width: 780px; margin: 0 auto; padding: 18px 14px 130px; }
   @media (min-width: 640px) { .wrap { padding: 30px 24px 130px; } }
@@ -619,8 +619,8 @@
   let stormTimer = null;
   function storm(n, ms, colors, x, y) {
     if (!animOn) return;
-    rain.front(true); rain.burst(n, colors, x, y); rain.setTarget(Math.max(ambient, 130));
-    clearTimeout(stormTimer); stormTimer = setTimeout(() => { rain.setTarget(ambient); setTimeout(() => rain.front(false), 2200); }, ms);
+    rain.burst(n, colors, x, y); rain.setTarget(Math.max(ambient, 130));
+    clearTimeout(stormTimer); stormTimer = setTimeout(() => rain.setTarget(ambient), ms);
   }
 
   /* ---------- count-up numbers ---------- */
