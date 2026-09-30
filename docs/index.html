@@ -1,7 +1,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ein Spitzhackenschlag</title>
-<meta name="description" content="Poker-Rangliste der Freundesrunde">
+<meta name="description" content="Poker-Rangliste der Freundesrunde. Keiner mag Hooles.">
+<meta property="og:title" content="Ein Spitzhackenschlag">
+<meta property="og:description" content="Keiner mag Hooles">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://valentinmarketkings.github.io/poker-tracker/">
+<!--
+  ♠ ♥ ♦ ♣   Ein Spitzhackenschlag   ♣ ♦ ♥ ♠
+  Wer bis hierhin liest, weiß es längst: Keiner mag Hooles.
+-->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500..900&family=Manrope:wght@400..800&display=swap">
 <style>
@@ -76,6 +84,7 @@
   /* ---------- Chips ---------- */
   .chip-av {
     --c: #888; --sz: 40px;
+    user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
     position: relative; display: inline-grid; place-items: center; flex: none;
     width: var(--sz); height: var(--sz); border-radius: 50%;
     background: repeating-conic-gradient(from -11.25deg, var(--c) 0 30deg, #f6f0e2 30deg 45deg);
@@ -160,7 +169,8 @@
   .pcard:hover { transform: translateY(-6px); }
   .slot.a .pcard { padding-top: 38px; box-shadow: 0 1px 0 rgba(255,255,255,0.6) inset, 0 0 0 2px var(--gold), 0 0 0 4px rgba(214,178,90,0.25), 0 18px 40px rgba(0,0,0,0.65); }
   .pcard > * { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
-  .pcard .pback { position: absolute; inset: 0; border-radius: 12px; transform: rotateY(180deg); background: repeating-linear-gradient(45deg, rgba(214,178,90,0.35) 0 2px, transparent 2px 9px), repeating-linear-gradient(-45deg, rgba(214,178,90,0.35) 0 2px, transparent 2px 9px), linear-gradient(#8f1521, #5c0c15); border: 5px solid #f3ecdc; outline: 1px solid var(--gold-deep); outline-offset: -9px; display: grid; place-items: center; color: var(--gold-2); font-size: 34px; }
+  .pcard .pback { position: absolute; inset: 0; border-radius: 12px; transform: rotateY(180deg); background: repeating-linear-gradient(45deg, rgba(214,178,90,0.35) 0 2px, transparent 2px 9px), repeating-linear-gradient(-45deg, rgba(214,178,90,0.35) 0 2px, transparent 2px 9px), linear-gradient(#8f1521, #5c0c15); border: 5px solid #f3ecdc; outline: 1px solid var(--gold-deep); outline-offset: -9px; display: grid; place-content: center; justify-items: center; gap: 3px; color: var(--gold-2); font-size: 34px; line-height: 1; }
+  .pcard .pback .bt { font-family: var(--body); font-size: 7px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(240,212,138,0.9); white-space: nowrap; }
   .pcard .idx { position: absolute; font-family: var(--display); font-weight: 800; font-size: 18px; line-height: 0.95; display: flex; flex-direction: column; align-items: center; }
   .pcard .idx.tl { top: 7px; left: 8px; } .pcard .idx.br { bottom: 7px; right: 8px; transform: rotate(180deg); }
   .pcard .idx .su { font-family: var(--body); font-size: 15px; }
@@ -277,6 +287,11 @@
   footer .links { display: flex; gap: 12px; flex-wrap: wrap; }
   footer button { background: none; border: 0; padding: 0; color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; font-size: 12px; }
   .mode-note { font-size: 12px; color: var(--ink-3); }
+  .whisper { margin: 34px 0 0; text-align: center; font-size: 11px; letter-spacing: 0.34em; text-transform: uppercase; font-weight: 800; color: rgba(243,236,220,0.06); transition: color 0.6s; }
+  .whisper:hover { color: var(--ink-3); }
+  @media print { .whisper { color: #000; } }
+  .chip-av.nope { animation: nope 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) 1; }
+  @keyframes nope { 10%, 90% { transform: translateX(-1px) rotate(-6deg); } 20%, 80% { transform: translateX(2px) rotate(6deg); } 30%, 50%, 70% { transform: translateX(-4px) rotate(-12deg); } 40%, 60% { transform: translateX(4px) rotate(12deg); } }
 
   /* ---------- Intro ---------- */
   .intro { position: fixed; inset: 0; z-index: 55; background: radial-gradient(ellipse 80% 60% at 50% 45%, #1b0609 0%, #0b0a0c 70%); display: grid; place-items: center; cursor: pointer; transition: opacity 0.6s ease, transform 0.6s ease; overflow: hidden; }
@@ -292,6 +307,7 @@
   .icard .face .su { font-family: var(--body); font-size: 30px; display: block; line-height: 1; margin-top: 2px; }
   .icard.red .face { color: #c0182a; }
   .icard .back { transform: rotateY(180deg); background: repeating-linear-gradient(45deg, rgba(214,178,90,0.35) 0 2px, transparent 2px 9px), repeating-linear-gradient(-45deg, rgba(214,178,90,0.35) 0 2px, transparent 2px 9px), linear-gradient(#8f1521, #5c0c15); border: 4px solid #f3ecdc; outline: 1px solid var(--gold-deep); outline-offset: -8px; }
+  .icard .back::after { content: "Keiner mag Hooles"; position: absolute; left: 0; right: 0; bottom: 9px; text-align: center; font: 800 7px/1 Manrope, sans-serif; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(240,212,138,0.85); }
   @keyframes dealIn { 0% { transform: translateY(70vh) rotate(-30deg) rotateY(180deg); opacity: 0; } 12% { opacity: 1; } 100% { transform: translateY(0) rotate(var(--tilt)) rotateY(0deg); opacity: 1; } }
   .intro-title { font-family: var(--display); font-weight: 800; font-size: clamp(34px, 8vw, 68px); line-height: 1; margin: 28px 0 0; color: var(--ink); perspective: 600px; text-wrap: balance; }
   .intro-title .L { display: inline-block; padding: 0 0.03em 0.14em; margin-bottom: -0.14em; transform-origin: 50% 100%; animation: letter 0.6s var(--ease) both; animation-delay: calc(0.9s + var(--i) * 40ms); background: linear-gradient(100deg, #f3ecdc, #ffffff 30%, #f0d48a 55%, #d6b25a 75%, #f3ecdc); -webkit-background-clip: text; background-clip: text; color: transparent; }
@@ -428,6 +444,7 @@
       <button type="button" id="demo-off" hidden>Beispiel beenden</button>
     </div>
   </footer>
+  <p class="whisper" aria-hidden="true">Keiner mag Hooles</p>
 </div>
 
 <button class="fab" id="fab" type="button" hidden>
@@ -551,7 +568,7 @@
       const u = Math.random();
       const kind = u < 0.45 ? "chip" : u < 0.8 ? "note" : "coin";
       const p = { kind, x: Math.random() * W, y: -40 - Math.random() * H * 0.4, vy: 110 + Math.random() * 150, vx: (Math.random() - 0.5) * 30, rot: Math.random() * Math.PI * 2, vr: (Math.random() - 0.5) * 3, ph: Math.random() * Math.PI * 2, vph: 1.4 + Math.random() * 2, r: 9 + Math.random() * 9, g: 0, col: o.colors ? pick(o.colors) : pick(CHIPS) };
-      if (kind === "note") { p.w = 44 + Math.random() * 18; p.h = p.w * 0.5; p.vy *= 0.55; p.vr *= 0.5; p.note = pick(NOTES); }
+      if (kind === "note") { p.w = 44 + Math.random() * 18; p.h = p.w * 0.5; p.vy *= 0.55; p.vr *= 0.5; p.note = pick(NOTES); if (Math.random() < 1 / 22) { p.hooles = true; p.note = ["0", "#8f1521", "#f6e9e6"]; p.w = 64 + Math.random() * 12; p.h = p.w * 0.5; } }
       if (kind === "coin") { p.r = 8 + Math.random() * 6; p.vy *= 1.2; }
       if (o.fill) { p.y = Math.random() * H; }
       if (o.burst) { p.x = (o.x ?? W / 2) + (Math.random() - 0.5) * 60; p.y = o.y ?? H * 0.62; p.vy = -(280 + Math.random() * 380); p.vx = (Math.random() - 0.5) * 460; p.g = 900; }
@@ -578,8 +595,14 @@
       ctx.strokeStyle = ink; ctx.lineWidth = 1.2; rr(-p.w / 2 + 3, -p.h / 2 + 3, p.w - 6, p.h - 6, 2); ctx.stroke();
       ctx.fillStyle = ink; ctx.globalAlpha *= 0.18; ctx.beginPath(); ctx.arc(-p.w * 0.22, 0, p.h * 0.32, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha /= 0.18;
       ctx.fillStyle = ink; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      ctx.font = `800 ${Math.round(p.h * 0.5)}px Manrope, sans-serif`; ctx.fillText(val, p.w * 0.12, 1);
-      ctx.font = `800 ${Math.round(p.h * 0.28)}px Manrope, sans-serif`; ctx.fillText("€", p.w * 0.36, -p.h * 0.22); ctx.fillText("€", -p.w * 0.38, p.h * 0.24);
+      if (p.hooles) {
+        ctx.font = `800 ${Math.max(6, Math.round(p.h * 0.23))}px Manrope, sans-serif`;
+        ctx.fillText("KEINER MAG", 0, -p.h * 0.17); ctx.fillText("HOOLES", 0, p.h * 0.17);
+        ctx.font = `800 ${Math.max(5, Math.round(p.h * 0.2))}px Manrope, sans-serif`; ctx.fillText("0", -p.w * 0.41, -p.h * 0.3); ctx.fillText("0", p.w * 0.41, p.h * 0.3);
+      } else {
+        ctx.font = `800 ${Math.round(p.h * 0.5)}px Manrope, sans-serif`; ctx.fillText(val, p.w * 0.12, 1);
+        ctx.font = `800 ${Math.round(p.h * 0.28)}px Manrope, sans-serif`; ctx.fillText("€", p.w * 0.36, -p.h * 0.22); ctx.fillText("€", -p.w * 0.38, p.h * 0.24);
+      }
       ctx.restore();
     }
     function drawCoin(p) {
@@ -722,7 +745,7 @@
   }
 
   /* ---------- rendering ---------- */
-  function chip(p, size = "") { return el("span", { class: `chip-av ${size}`.trim(), style: `--c:${p.color}`, "aria-hidden": "true" }, el("span", {}, initials(p.name))); }
+  function chip(p, size = "") { return el("span", { class: `chip-av ${size}`.trim(), style: `--c:${p.color}`, "data-pid": p.id, "aria-hidden": "true" }, el("span", {}, initials(p.name))); }
   function crownSvg() {
     const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     s.setAttribute("viewBox", "0 0 34 26"); s.setAttribute("class", "crown"); s.setAttribute("aria-hidden", "true");
@@ -744,9 +767,9 @@
     const t = $("#ticker"); t.replaceChildren();
     const items = [];
     const lead = S.ranked[0], fish = S.ranked[S.ranked.length - 1], last = S.sessions[S.sessions.length - 1];
-    if (lead && lead.balance > 0) items.push(`${playerById(lead.id).name} führt mit ${fmt(lead.balance)}`);
+    if (lead && lead.balance > 0) items.push(`${playerById(lead.id).name} führt mit ${fmt(lead.balance)}${lead.id === "hooles" ? " · und trotzdem mag ihn keiner" : ""}`);
     if (fish && fish.balance < 0 && S.ranked.length >= 3 && S.ranked.filter(x => x.balance === fish.balance).length === 1) items.push(`Der Fisch: ${playerById(fish.id).name} mit ${fmt(fish.balance)}`);
-    if (last) items.push(`Letzter Sieger: ${playerById(last.winner).name} am ${shortDate(last.date)}`);
+    if (last) items.push(`Letzter Sieger: ${playerById(last.winner).name} am ${shortDate(last.date)}${last.winner === "hooles" ? " · unbeliebt, aber gut" : ""}`);
     const hot = S.ranked.filter(r => r.streak >= 2).sort((a, b) => b.streak - a.streak)[0];
     if (hot) items.push(`${playerById(hot.id).name}: ${hot.streak} Siege in Folge`);
     if (S.sessions.length) items.push(`${S.sessions.length} ${S.sessions.length === 1 ? "Abend" : "Abende"} · ${fmt(S.totalPot, false)} auf dem Tisch`); else items.push("Noch kein Abend eingetragen");
@@ -773,7 +796,7 @@
       card.append(el("span", { class: "place" }, place), chip(p, k.startsWith("a") ? "xl" : "lg"),
         el("div", { class: "name" }, p.name), bal,
         el("div", { class: "meta" }, `${r.played} Abende · ${Math.round(r.winRate * 100)} % gewonnen`),
-        el("div", { class: "pback", "aria-hidden": "true" }, "♠"));
+        el("div", { class: "pback", "aria-hidden": "true" }, el("span", { class: "bs" }, "♠"), el("span", { class: "bt" }, "Keiner mag Hooles")));
       countUp(bal, r.balance, v => fmt(v), 1300);
       box.append(el("div", { class: `slot ${k} ${firstPaint ? "enter" : ""}`, style: `--i:${i}` }, card));
     }
@@ -826,7 +849,8 @@
             st(fmt(r.worst), "Schlechtester Abend"),
             st(`${r.longestWin}`, "Längste Siegesserie"),
             st(fmt(r.buyIn, false), "Eingezahlt gesamt"),
-            st(fmt(r.cashOut, false), "Ausgezahlt gesamt")),
+            st(fmt(r.cashOut, false), "Ausgezahlt gesamt"),
+            r.id === "hooles" ? st("0", "Leute, die Hooles mögen") : null),
           sparkline(r.curve, p.color)));
       }
       list.append(li);
@@ -1209,7 +1233,7 @@
   }
   function celebrateNow(c) {
     const p = playerById(c.winner);
-    toast(p ? `Abend gespeichert. Sieger: ${p.name} mit ${fmt(c.net)}` : "Abend gespeichert.");
+    toast(p ? `Abend gespeichert. Sieger: ${p.name} mit ${fmt(c.net)}${p.id === "hooles" ? " Keiner mag ihn trotzdem." : ""}` : "Abend gespeichert.");
     if (!animOn) return;
     const colors = p ? [[p.color, "#f3ecdc"], ["#d6b25a", "#17151a"], [p.color, "#f3ecdc"], ["#f3ecdc", "#b41c2b"]] : undefined;
     storm(320, 3600, colors);
@@ -1258,7 +1282,37 @@
     let mt = null;
     addEventListener("pointermove", e => { if (mt) return; mt = requestAnimationFrame(() => { mt = null; document.documentElement.style.setProperty("--mx", e.clientX + "px"); document.documentElement.style.setProperty("--my", e.clientY + "px"); }); });
   }
-  document.addEventListener("visibilitychange", () => rain.pause(document.hidden));
+  const realTitle = document.title;
+  document.addEventListener("visibilitychange", () => { rain.pause(document.hidden); document.title = document.hidden ? "Keiner mag Hooles 🐟" : realTitle; });
+
+  /* ---------- easter eggs ---------- */
+  const HOOLES = "hooles";
+  console.log("%c♠ Keiner mag Hooles ♠", "font:800 18px 'Bodoni Moda',Georgia,serif;color:#f0d48a;background:#8f1521;padding:6px 14px;border-radius:6px");
+  let eggAt = 0;
+  function hoolesMoment(x, y) {
+    const now = Date.now(); if (now - eggAt < 4000) return; eggAt = now;
+    const hp = playerById(HOOLES);
+    toast("Keiner mag Hooles.");
+    document.querySelectorAll(`.chip-av[data-pid="${HOOLES}"]`).forEach(c => { c.classList.remove("nope"); void c.offsetWidth; c.classList.add("nope"); setTimeout(() => c.classList.remove("nope"), 900); });
+    if (animOn) storm(160, 2400, hp ? [[hp.color, "#f3ecdc"], ["#8f1521", "#f3ecdc"], [hp.color, "#17151a"]] : undefined, x, y);
+  }
+  let pressTimer = null, swallowClick = false;
+  document.addEventListener("pointerdown", e => {
+    const c = e.target.closest ? e.target.closest(`.chip-av[data-pid="${HOOLES}"]`) : null; if (!c) return;
+    clearTimeout(pressTimer);
+    pressTimer = setTimeout(() => { pressTimer = null; swallowClick = true; setTimeout(() => { swallowClick = false; }, 900); const r = c.getBoundingClientRect(); hoolesMoment(r.left + r.width / 2, r.top + r.height / 2); }, 650);
+  });
+  const endPress = () => { clearTimeout(pressTimer); pressTimer = null; };
+  document.addEventListener("pointerup", endPress); document.addEventListener("pointercancel", endPress);
+  document.addEventListener("click", e => { if (swallowClick) { swallowClick = false; e.stopPropagation(); e.preventDefault(); } }, true);
+  document.addEventListener("contextmenu", e => { if (e.target.closest && e.target.closest(`.chip-av[data-pid="${HOOLES}"]`)) e.preventDefault(); });
+  let typed = "";
+  document.addEventListener("keydown", e => {
+    if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+    if (!e.key || e.key.length !== 1) return;
+    typed = (typed + e.key.toLowerCase()).slice(-6);
+    if (typed === HOOLES) { typed = ""; hoolesMoment(); }
+  });
 
   /* ---------- boot ---------- */
   function loadState() {

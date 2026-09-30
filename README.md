@@ -58,6 +58,23 @@ Seite setzt das letzte Wort immer auf eine eigene Zeile. Der Browser-Tab heißt 
 - **Aus-Schalter** im Footer („Animationen aus“, pro Gerät), außerdem automatisch aus bei
   `prefers-reduced-motion`. Der Regen pausiert, wenn der Tab im Hintergrund ist.
 
+## Easter Eggs („Keiner mag Hooles“)
+
+Auf Valentins Wunsch an zwölf Stellen leicht versteckt, damit die Runde sie nach und nach findet:
+
+1. Link-Vorschau in WhatsApp/iMessage (`og:description`) und Seitenbeschreibung.
+2. Kommentar ganz oben im Quelltext.
+3. Konsolen-Banner beim Laden.
+4. Tab-Titel wird „Keiner mag Hooles 🐟“, sobald der Tab im Hintergrund ist.
+5. Seltener „Hooles-Schein“ (0 €) im Geldregen, etwa jeder 22. Schein.
+6. Rückseite der Podiumskarten (während des Umdrehens) und der Intro-Karten.
+7. Extra-Kachel „0 · Leute, die Hooles mögen“ in Hooles' aufgeklappter Statistik.
+8. Laufband-Varianten, wenn Hooles führt oder den letzten Abend gewonnen hat.
+9. Sieger-Meldung beim Speichern, wenn Hooles gewinnt.
+10. Fast unsichtbare Flüsterzeile unter dem Footer (bei Maus darüber lesbar).
+11. Druckansicht zeigt die Flüsterzeile schwarz.
+12. Geste: Hooles' Chip lange gedrückt halten, oder am Rechner „hooles“ tippen → Meldung, Chips wackeln, Sturm.
+
 ## Spielerfarben
 
 Die acht Farben sind mit dem dataviz-Validator geprüft (Helligkeitsband, Chroma, Farbfehlsichtigkeit
