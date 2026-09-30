@@ -720,7 +720,11 @@
   function computeBadges(S) {
     const list = [];
     const played = S.ranked;
-    const pick = (arr, key, dir = 1) => arr.length ? arr.reduce((a, b) => (dir * (key(b) - key(a)) > 0 ? b : a)) : null;
+    const pick = (arr, key, dir = 1) => {
+      if (!arr.length) return null;
+      const best = arr.reduce((a, b) => (dir * (key(b) - key(a)) > 0 ? b : a));
+      return arr.filter(x => key(x) === key(best)).length === 1 ? best : null;
+    };
     const add = (ic, t, r, why, c) => list.push({ ic, t, who: r ? r.id : null, why, c });
     const unique = r => r && played.filter(x => x.balance === r.balance).length === 1;
     const top = unique(played[0]) ? played[0] : null;

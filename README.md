@@ -38,8 +38,8 @@ Repository ändern; im Zweifel bei GitHub widerrufen.
 ```
 
 Gewinn pro Spieler und Abend = `cashOut − buyIn`. Das Formular prüft die Nullsumme und lässt Abweichungen
-nur mit ausdrücklichem Haken zu. Titel (Fisch, Sponsor, Bankomat, Stammgast) werden nur bei eindeutigem
-Stand vergeben.
+nur mit ausdrücklichem Haken zu. Alle Titel und Auszeichnungen werden nur bei eindeutigem
+Stand vergeben; bei Gleichstand bleibt der Titel offen.
 
 ## Titel
 
