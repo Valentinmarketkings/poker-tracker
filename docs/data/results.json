@@ -77,7 +77,44 @@
           "cashOut": 0
         }
       ]
+    },
+    {
+      "id": "2026-09-30-zweite",
+      "date": "2026-09-30",
+      "title": "",
+      "entries": [
+        {
+          "player": "valentin",
+          "buyIn": 10,
+          "cashOut": 30
+        },
+        {
+          "player": "phileas",
+          "buyIn": 10,
+          "cashOut": 0
+        },
+        {
+          "player": "bardiya",
+          "buyIn": 10,
+          "cashOut": 11.5
+        },
+        {
+          "player": "benny",
+          "buyIn": 10,
+          "cashOut": 8.5
+        },
+        {
+          "player": "moritz",
+          "buyIn": 10,
+          "cashOut": 10
+        },
+        {
+          "player": "hooles",
+          "buyIn": 10,
+          "cashOut": 0
+        }
+      ]
     }
   ],
-  "updatedAt": "2026-09-30T19:37:31Z"
+  "updatedAt": "2026-09-30T23:30:42Z"
 }
