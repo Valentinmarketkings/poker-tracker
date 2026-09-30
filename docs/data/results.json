@@ -15,11 +15,6 @@
       "color": "#3987E5"
     },
     {
-      "id": "ayden",
-      "name": "Ayden",
-      "color": "#D95926"
-    },
-    {
       "id": "bardiya",
       "name": "Bardiya",
       "color": "#1F9AA8"
@@ -28,11 +23,6 @@
       "id": "benny",
       "name": "Benny",
       "color": "#E66767"
-    },
-    {
-      "id": "kinan",
-      "name": "Kinan",
-      "color": "#9085E9"
     },
     {
       "id": "moritz",
@@ -89,5 +79,5 @@
       ]
     }
   ],
-  "updatedAt": "2026-09-13T12:58:46Z"
+  "updatedAt": "2026-09-30T19:37:31Z"
 }

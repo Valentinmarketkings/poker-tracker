@@ -1,6 +1,6 @@
 # poker-tracker — „Ein Spitzhackenschlag“
 
-Poker-Rangliste der Freundesrunde (Cash Game, 10 Spieler, Standard-Buy-in 10 €).
+Poker-Rangliste der Freundesrunde (Cash Game, 8 Spieler, Standard-Buy-in 10 €).
 Eine statische Webseite auf GitHub Pages, ohne Anmeldung für alle mit dem Link erreichbar:
 
 https://valentinmarketkings.github.io/poker-tracker/
@@ -60,7 +60,7 @@ Seite setzt das letzte Wort immer auf eine eigene Zeile. Der Browser-Tab heißt 
 
 ## Spielerfarben
 
-Die zehn Farben sind mit dem dataviz-Validator geprüft (Helligkeitsband, Chroma, Farbfehlsichtigkeit
+Die acht Farben sind mit dem dataviz-Validator geprüft (Helligkeitsband, Chroma, Farbfehlsichtigkeit
 benachbarter Paare, Kontrast ≥ 3:1). Die Reihenfolge ist Teil der Prüfung; neue Spieler werden hinten
 angehängt und gegen den Vorgänger geprüft.
 
